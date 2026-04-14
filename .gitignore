@@ -1,0 +1,33 @@
+# .NET build outputs
+bin/
+obj/
+*.user
+*.suo
+
+# EF Core migrations snapshot (optional, some teams commit this)
+# *.Designer.cs
+
+# Secrets and environment
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+*.env
+.env
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# Node / React
+node_modules/
+dist/
+.next/
+
+# OS
+.DS_Store
+Thumbs.db
