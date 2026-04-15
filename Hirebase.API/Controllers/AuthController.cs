@@ -1,0 +1,67 @@
+using Hirebase.Application.DTOs.Auth;
+using Hirebase.Application.Interfaces;
+using Hirebase.Domain.Exceptions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Update;
+
+namespace Hirebase.API.Controllers;
+
+[ApiController]
+[Route("api/auth")]
+public class AuthController : ControllerBase
+{
+    private readonly IAuthService _authService;
+
+    public AuthController(IAuthService authService)
+    {
+        _authService = authService;
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+    {
+        var result = await _authService.Register(dto);
+        SetRefreshTokenCookie(result.RefreshToken);
+        return Ok(new {accessToken = result.AccessToken});
+
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDto dto)
+    {
+        var result = await _authService.Login(dto);
+        SetRefreshTokenCookie(result.RefreshToken);
+        return Ok(new {accessToken = result.AccessToken});
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh()
+    {
+        var rt = Request.Cookies["refreshToken"] ?? throw new UnauthorizedException("No refresh token");
+
+        var (accessToken, refreshToken) = await _authService.Refresh(rt);
+        SetRefreshTokenCookie(rt);
+        return Ok(new{accessToken});
+
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var rt = Request.Cookies["refreshToken"];
+        if (rt != null) await _authService.Logout(rt);
+        Response.Cookies.Delete("refreshToken");
+        return NoContent();
+    }
+
+    private void SetRefreshTokenCookie(string rt)
+    {
+        Response.Cookies.Append("refreshToken", rt, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        });
+    }
+}
