@@ -4,6 +4,6 @@ namespace Hirebase.Application.Interfaces;
 
 public interface IJwtService
 {
-    string GenrerateAccessToken(User user);
+    string GenerateAccessToken(User user);
     string GenerateRefreshToken();
 }

@@ -18,7 +18,7 @@ public class JwtService : IJwtService
         _config = config;
     }
 
-    public string GenrerateAccessToken(User user)
+    public string GenerateAccessToken(User user)
     {
         var secret = _config["JwtSettings:Secret"]
             ?? throw new InvalidOperationException("JWT secret missing");
