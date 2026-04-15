@@ -4,13 +4,15 @@ namespace Hirebase.Domain.Entities;
 
 public class User
 {
-    public Guid Id {get;set;}
+    public Guid Id {get;set;} = Guid.NewGuid();
     public string Email {get;set;} = string.Empty;
     public string PasswordHash {get;set;} = string.Empty;
 
     public UserRole Role {get;set;}
 
-    public DateTime CreatedAt {get;set;}
+    public DateTime CreatedAt {get;set;} = DateTime.UtcNow;
+
+    public DateTime updatedAt {get;set;} = DateTime.UtcNow;
 
     public RefreshToken? RefreshToken {get;set;}
 }

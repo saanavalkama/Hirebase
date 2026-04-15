@@ -1,0 +1,13 @@
+using Hirebase.Domain.Entities;
+
+namespace Hirebase.Application.Interfaces;
+
+public interface IAuthRepository
+{
+    Task<User?> FindByEmail(string email);
+    Task<User> CreateUser(User user);
+    Task SaveRefreshToken(RefreshToken refreshToken);
+    Task <RefreshToken?> GetRefreshToken(string token);
+    Task RevokeRefreshToken(RefreshToken token);
+
+}
