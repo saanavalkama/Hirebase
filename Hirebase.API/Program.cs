@@ -4,19 +4,25 @@ using Hirebase.API.Settings;
 using Hirebase.API.Middleware;
 using Hirebase.Application.Interfaces;
 using Hirebase.Infrastructure.Services;
-using System.IdentityModel.Tokens.Jwt;
 using Hirebase.Infrastructure.Repositories;
 using Hirebase.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Hirebase.Application.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+//db
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+//validation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
 
 builder.Services.AddOptions<ConnectionSettings>()
     .BindConfiguration("ConnectionStrings")
@@ -30,16 +36,30 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowClient", policy =>
+    {
+        var allowedOrigins = builder.Configuration["AllowedOrigins"];
+        if(string.IsNullOrEmpty(allowedOrigins)) throw new InvalidOperationException("AllowedOrigins Missigng");
+        
+        policy
+            .WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        var secret = builder.Configuration["JwtSettings:Secret"];
+        if(string.IsNullOrEmpty(secret)) throw new InvalidOperationException("Secret is missing");
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]
-                ?? throw new InvalidOperationException("JWT Secret missing"))     
-            ),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
             ValidateIssuer = false,
             ValidateAudience = false,
             ClockSkew = TimeSpan.Zero
@@ -49,7 +69,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors("AllowClient");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+public partial class Program{}

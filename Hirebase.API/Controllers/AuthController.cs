@@ -2,7 +2,7 @@ using Hirebase.Application.DTOs.Auth;
 using Hirebase.Application.Interfaces;
 using Hirebase.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Update;
+
 
 namespace Hirebase.API.Controllers;
 
@@ -40,7 +40,7 @@ public class AuthController : ControllerBase
         var rt = Request.Cookies["refreshToken"] ?? throw new UnauthorizedException("No refresh token");
 
         var (accessToken, refreshToken) = await _authService.Refresh(rt);
-        SetRefreshTokenCookie(rt);
+        SetRefreshTokenCookie(refreshToken);
         return Ok(new{accessToken});
 
     }
@@ -54,13 +54,14 @@ public class AuthController : ControllerBase
         return NoContent();
     }
 
+    // TODO: set Secure = true and SameSite = Strict in production
     private void SetRefreshTokenCookie(string rt)
     {
         Response.Cookies.Append("refreshToken", rt, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
+            Secure = false,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(7)
         });
     }
