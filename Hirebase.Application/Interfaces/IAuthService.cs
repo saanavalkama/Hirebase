@@ -8,4 +8,5 @@ public interface IAuthService
     Task<AuthResponseDto> Login(LoginDto dto);
     Task<(string accessToken, string refreshToken)> Refresh(string refreshToken);
     Task Logout(string refreshToken);
+    Task LogoutAllDevices(string refreshToken);
 }

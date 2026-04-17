@@ -10,4 +10,7 @@ public interface IAuthRepository
     Task <RefreshToken?> GetRefreshToken(string token);
     Task RevokeRefreshToken(RefreshToken token);
 
+    Task RevokeFamily(Guid familyId);
+
+    Task RevokeAllByUserId(Guid userId);
 }

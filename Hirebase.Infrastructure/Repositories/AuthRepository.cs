@@ -45,5 +45,23 @@ public class AuthRepository: IAuthRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task RevokeFamily(Guid familyId)
+    {
+        var tokens = await _context.RefreshTokens.Where(r => r.FamilyId == familyId).ToListAsync();
+        foreach(var token in tokens)
+            token.RevokedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RevokeAllByUserId(Guid userId)
+    {
+        var tokens = await _context.RefreshTokens.Where(r => r.UserId == userId && r.RevokedAt == null).ToListAsync();
+
+        foreach(var token in tokens)
+            token.RevokedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+    }
 
 }

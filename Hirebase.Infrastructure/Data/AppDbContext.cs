@@ -25,9 +25,11 @@ public class AppDbContext : DbContext{
         modelBuilder.Entity<RefreshToken>(entity =>
         {
             entity.HasKey(r => r.Id);
+            entity.HasIndex(r => r.Token).IsUnique();
+            entity.HasIndex(r => r.FamilyId);
             entity.HasOne(r => r.User)
-                .WithOne(u => u.RefreshToken)
-                .HasForeignKey<RefreshToken>(r => r.UserId)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
         });

@@ -23,7 +23,8 @@ api.interceptors.response.use(
 
         if(axios.isAxiosError(error) &&
         error.response?.status === 401 && 
-        !originalRequest._retry
+        !originalRequest._retry && 
+        !originalRequest.url?.includes('/api/auth/refresh')
         ){
             originalRequest._retry = true
 

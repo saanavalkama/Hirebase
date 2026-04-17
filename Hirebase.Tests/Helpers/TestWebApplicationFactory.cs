@@ -35,9 +35,11 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         foreach (var descriptor in descriptors)
             services.Remove(descriptor);
 
+        var dbName = Guid.NewGuid().ToString();
+
         // replace with in-memory
         services.AddDbContext<AppDbContext>(options =>
-            options.UseInMemoryDatabase("TestDb"));
+            options.UseInMemoryDatabase(dbName));
         });
 
         builder.UseEnvironment("Test");

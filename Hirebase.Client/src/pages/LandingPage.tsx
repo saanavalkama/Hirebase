@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 function useReveal(delay = 500) {
@@ -61,11 +62,11 @@ export default function LandingPage() {
             <a href="#how-it-works" className="hover:text-stone-100 transition-colors">How it works</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" className="text-stone-400 hover:text-stone-100 hover:bg-white/[0.06]">
-              Log in
+            <Button asChild variant="ghost" className="text-stone-400 hover:text-stone-100 hover:bg-white/[0.06]">
+              <Link to="/login">Log in</Link>
             </Button>
-            <Button className="bg-teal-600 hover:bg-teal-500 text-white rounded-full px-5">
-              Get started
+            <Button asChild className="bg-teal-600 hover:bg-teal-500 text-white rounded-full px-5">
+              <Link to="/register">Get started</Link>
             </Button>
           </div>
         </div>
@@ -99,14 +100,15 @@ export default function LandingPage() {
 
         <Reveal delay={240}>
           <div className="mt-10 flex flex-col sm:flex-row items-center gap-3">
-            <Button className="bg-teal-600 hover:bg-teal-500 text-white rounded-full px-8 py-6 text-base font-medium shadow-lg shadow-teal-500/20">
-              Find Talent
+            <Button asChild className="bg-teal-600 hover:bg-teal-500 text-white rounded-full px-8 py-6 text-base font-medium shadow-lg shadow-teal-500/20">
+              <Link to="/register">Find Talent</Link>
             </Button>
             <Button
+              asChild
               variant="outline"
               className="rounded-full px-8 py-6 text-base font-medium border-white/10 text-stone-300 hover:bg-white/[0.06] bg-transparent"
             >
-              Find Jobs
+              <Link to="/register">Find Jobs</Link>
             </Button>
           </div>
           <p className="mt-4 text-sm text-stone-500">Free to get started · No credit card required</p>
@@ -226,14 +228,15 @@ export default function LandingPage() {
         </Reveal>
         <Reveal delay={120}>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button className="bg-teal-600 hover:bg-teal-500 text-white rounded-full px-8 py-6 text-base font-medium shadow-lg shadow-teal-500/20">
-              I'm hiring →
+            <Button asChild className="bg-teal-600 hover:bg-teal-500 text-white rounded-full px-8 py-6 text-base font-medium shadow-lg shadow-teal-500/20">
+              <Link to="/register">I'm hiring →</Link>
             </Button>
             <Button
+              asChild
               variant="outline"
               className="rounded-full px-8 py-6 text-base font-medium border-white/10 text-stone-300 hover:bg-white/[0.06] bg-transparent"
             >
-              I'm looking for work →
+              <Link to="/register">I'm looking for work →</Link>
             </Button>
           </div>
         </Reveal>

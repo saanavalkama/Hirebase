@@ -23,3 +23,11 @@ public class UnauthorizedException : Exception
     public UnauthorizedException(string message) 
         : base(message) { }
 }
+
+public class BadRequestError : Exception
+{
+    public BadRequestError(string message) : base(message)
+    {
+        
+    }
+}

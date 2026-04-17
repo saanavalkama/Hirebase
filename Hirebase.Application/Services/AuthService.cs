@@ -22,14 +22,17 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto> Register(RegisterDto dto)
     {
-        var existing = await _repo.FindByEmail(dto.Email);
+        var existing = await _repo.FindByEmail(dto.Email.ToLower());
         if(existing != null) throw new ConflictException("Email already in use");
 
-        var role = Enum.Parse<UserRole>(dto.Role, ignoreCase:true);
+        if(!Enum.TryParse<UserRole>(dto.Role, ignoreCase:true, out var role))
+        {
+            throw new BadRequestError("Invalid role");
+        }
 
         var user = new User
         {
-            Email = dto.Email,
+            Email = dto.Email.ToLower(),
             PasswordHash = _hasher.Hash(dto.Password),
             Role = role
         };
@@ -38,7 +41,7 @@ public class AuthService : IAuthService
 
         var accessToken = _jwt.GenerateAccessToken(user);
 
-        var rt = await CreateAndSaveRefreshToken(createdUser.Id);
+        var rt = await CreateAndSaveRefreshToken(createdUser.Id,Guid.NewGuid());
 
         return new AuthResponseDto(accessToken,rt);
         
@@ -47,14 +50,14 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto> Login(LoginDto dto)
     {
-        var user = await _repo.FindByEmail(dto.Email) ?? throw new UnauthorizedException("Invalid credentials");
+        var user = await _repo.FindByEmail(dto.Email.ToLower()) ?? throw new UnauthorizedException("Invalid credentials");
         var isValid = _hasher.Verify(dto.Password, user.PasswordHash);
 
         if(!isValid) throw new UnauthorizedException("Invalid credentials");
 
         var accessToken = _jwt.GenerateAccessToken(user);
 
-        var rt = await CreateAndSaveRefreshToken(user.Id);
+        var rt = await CreateAndSaveRefreshToken(user.Id, Guid.NewGuid());
 
         return new AuthResponseDto(accessToken,rt);
 
@@ -63,13 +66,17 @@ public class AuthService : IAuthService
     public async Task<(string accessToken, string refreshToken)> Refresh(string rt)
     {
         var token = await _repo.GetRefreshToken(rt) ?? throw new UnauthorizedException("Invalid token");
+        if(token.RevokedAt != null)
+        {
+            await _repo.RevokeFamily(token.FamilyId);
+            throw new UnauthorizedException("Token reuse detected");
+        }
         if(token.ExpiresAt < DateTime.UtcNow) throw new UnauthorizedException("Token expired");
-        if(token.RevokedAt != null) throw new UnauthorizedException("Token revoked");
 
         await _repo.RevokeRefreshToken(token);
 
         var newAccessToken = _jwt.GenerateAccessToken(token.User);
-        var newRefreshToken = await CreateAndSaveRefreshToken(token.User.Id);
+        var newRefreshToken = await CreateAndSaveRefreshToken(token.User.Id,token.FamilyId);
 
         return (newAccessToken,newRefreshToken);
     }
@@ -78,16 +85,24 @@ public class AuthService : IAuthService
     {
         var token = await _repo.GetRefreshToken(rt);
         if(token == null) return;
-        await _repo.RevokeRefreshToken(token);
+        await _repo.RevokeFamily(token.FamilyId);
 
     }
 
-    private async Task<string> CreateAndSaveRefreshToken(Guid userId)
+    public async Task LogoutAllDevices(string rt)
+    {
+        var token = await _repo.GetRefreshToken(rt);
+        if(token == null) return;
+        await _repo.RevokeAllByUserId(token.UserId);
+    }
+
+    private async Task<string> CreateAndSaveRefreshToken(Guid userId, Guid familyId)
     {
         var refreshToken = new RefreshToken
         {
             Token = _jwt.GenerateRefreshToken(),
             UserId = userId,
+            FamilyId = familyId
         };
 
         await _repo.SaveRefreshToken(refreshToken);

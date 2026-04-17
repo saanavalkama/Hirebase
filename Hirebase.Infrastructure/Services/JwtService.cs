@@ -23,6 +23,13 @@ public class JwtService : IJwtService
         var secret = _config["JwtSettings:Secret"]
             ?? throw new InvalidOperationException("JWT secret missing");
 
+        var issuer = _config["JwtSettings:Issuer"]
+        ?? throw new InvalidOperationException("JWT issuer missing");
+        
+        var audience = _config["JwtSettings:Audience"]
+        ?? throw new InvalidOperationException("JWT audience missing");
+
+
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -34,6 +41,8 @@ public class JwtService : IJwtService
         };
 
         var token = new JwtSecurityToken(
+            issuer:issuer,
+            audience:audience,
             claims:claims,
             expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: credentials

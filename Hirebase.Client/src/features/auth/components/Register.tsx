@@ -6,10 +6,13 @@ import { Button } from '@/components/ui/button'
 import { useRegister } from '../hooks/authMutations'
 import {zodResolver} from '@hookform/resolvers/zod'
 import { registerSchema, type RegisterSchema} from '@/schemas/authValidation'
+import { Link, useNavigate } from 'react-router-dom'
 
 
 
 export default function Register(){
+
+    const navigate = useNavigate()
 
     const {register, handleSubmit,control, formState:{errors}} = useForm<RegisterSchema>({
         resolver: zodResolver(registerSchema),
@@ -23,7 +26,9 @@ export default function Register(){
             password: data.password,
             role: data.role
         }
-        registerMutation(payload)
+        registerMutation(payload,{
+            onSuccess:()=>navigate("/")
+        })
     }
 
     return(
@@ -37,8 +42,8 @@ export default function Register(){
                     </a>
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-stone-400">Already have an account?</span>
-                        <Button variant="ghost" className="text-stone-400 hover:text-stone-100 hover:bg-white/[0.06]">
-                            Log in
+                        <Button asChild variant="ghost" className="text-stone-400 hover:text-stone-100 hover:bg-white/[0.06]">
+                            <Link to="/login">Log in</Link>
                         </Button>
                     </div>
                 </div>

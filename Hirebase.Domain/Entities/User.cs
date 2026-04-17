@@ -14,5 +14,5 @@ public class User
 
     public DateTime UpdatedAt {get;set;} = DateTime.UtcNow;
 
-    public RefreshToken? RefreshToken {get;set;}
+    public ICollection<RefreshToken> RefreshTokens {get;set;} = [];
 }

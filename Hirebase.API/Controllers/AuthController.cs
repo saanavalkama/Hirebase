@@ -54,6 +54,15 @@ public class AuthController : ControllerBase
         return NoContent();
     }
 
+    [HttpPost("logout-all")]
+    public async Task<IActionResult> LogoutAllDevices()
+    {
+        var rt = Request.Cookies["refreshToken"];
+        if (rt != null) await _authService.LogoutAllDevices(rt);
+        Response.Cookies.Delete("refreshToken");
+        return NoContent();
+    }
+
     // TODO: set Secure = true and SameSite = Strict in production
     private void SetRefreshTokenCookie(string rt)
     {
@@ -61,7 +70,7 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = false,
-            SameSite = SameSiteMode.None,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTime.UtcNow.AddDays(7)
         });
     }
