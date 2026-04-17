@@ -3,4 +3,5 @@
   <Project Path="Hirebase.Application/Hirebase.Application.csproj" />
   <Project Path="Hirebase.Domain/Hirebase.Domain.csproj" />
   <Project Path="Hirebase.Infrastructure/Hirebase.Infrastructure.csproj" />
+  <Project Path="Hirebase.Tests/Hirebase.Tests.csproj" />
 </Solution>
