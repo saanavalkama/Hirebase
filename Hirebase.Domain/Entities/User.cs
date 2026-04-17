@@ -12,7 +12,7 @@ public class User
 
     public DateTime CreatedAt {get;set;} = DateTime.UtcNow;
 
-    public DateTime updatedAt {get;set;} = DateTime.UtcNow;
+    public DateTime UpdatedAt {get;set;} = DateTime.UtcNow;
 
     public RefreshToken? RefreshToken {get;set;}
 }
