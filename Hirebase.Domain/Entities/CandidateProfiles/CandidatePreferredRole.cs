@@ -1,7 +1,6 @@
-using System.Data.Common;
 using Hirebase.Domain.Enums;
 
-namespace Hirebase.Domain.Entities.CandidateProfile;
+namespace Hirebase.Domain.Entities.CandidateProfiles;
 
 public class CandidatePreferredRole
 {

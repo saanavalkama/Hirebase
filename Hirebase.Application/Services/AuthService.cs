@@ -1,6 +1,7 @@
 using Hirebase.Application.DTOs.Auth;
 using Hirebase.Application.Interfaces;
 using Hirebase.Domain.Entities.Auth;
+using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
 
@@ -11,12 +12,15 @@ public class AuthService : IAuthService
     private readonly IPasswordHasher _hasher;
 
     private readonly IJwtService _jwt;
+
+    private readonly ICandidateProfileRepository _candidateRepo;
     
-    public AuthService(IAuthRepository repo, IPasswordHasher hasher, IJwtService jwt)
+    public AuthService(IAuthRepository repo, IPasswordHasher hasher, IJwtService jwt, ICandidateProfileRepository canidateRepo)
     {
         _repo = repo;
         _hasher = hasher;
         _jwt = jwt;
+        _candidateRepo = canidateRepo;
 
     }
 
@@ -38,6 +42,11 @@ public class AuthService : IAuthService
         };
 
         var createdUser = await _repo.CreateUser(user);
+        if(role == UserRole.CANDIDATE)
+        {
+            await _candidateRepo.CreateProfile(new CandidateProfile {UserId = createdUser.Id});
+        }
+        
 
         var accessToken = _jwt.GenerateAccessToken(user);
 

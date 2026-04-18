@@ -1,7 +1,7 @@
 using Hirebase.Domain.Entities.Auth;
 using Hirebase.Domain.Enums;
 
-namespace Hirebase.Domain.Entities.CandidateProfile;
+namespace Hirebase.Domain.Entities.CandidateProfiles;
 
 public class CandidateProfile
 {
@@ -10,6 +10,8 @@ public class CandidateProfile
     public Guid UserId {get;set;}
 
     public User User {get;set;} = null!;
+
+    public string? Name {get;set;}
 
     public string? Location {get;set;}
 

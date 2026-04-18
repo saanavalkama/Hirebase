@@ -1,5 +1,7 @@
 using Hirebase.Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
+using Hirebase.Domain.Entities.CandidateProfiles;
+using Hirebase.Domain.Enums;
 
 namespace Hirebase.Infrastructure.Data;
 
@@ -7,7 +9,11 @@ public class AppDbContext : DbContext{
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     { 
     }
+    public DbSet<CandidateProfile> CandidateProfiles {get;set;}
 
+    public DbSet<CandidatePreferredRole> PreferredRoles {get;set;}
+
+    public DbSet<SoftSkill> SoftSkills {get;set;}
     public DbSet<User> Users {get;set;}
     public DbSet<RefreshToken> RefreshTokens {get;set;}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -31,6 +37,31 @@ public class AppDbContext : DbContext{
                 .WithMany(u => u.RefreshTokens)
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+        });
+
+        modelBuilder.Entity<CandidateProfile>(e =>
+        {
+            e.HasKey(c => c.Id);
+            
+            e
+              .HasOne(c => c.User)
+              .WithOne()
+              .HasForeignKey<CandidateProfile>(c => c.UserId)
+              .OnDelete(DeleteBehavior.Cascade);
+
+            e
+              .HasMany(c => c.SoftSkills)
+              .WithOne(s => s.CandidateProfile)
+              .HasForeignKey(s => s.CandidateProfileId)
+              .OnDelete(DeleteBehavior.Cascade);
+
+            e 
+              .HasMany(c => c.PreferredRoles)
+              .WithOne(r => r.CandidateProfile)
+              .HasForeignKey(r => r.CandidateProfileId)
+              .OnDelete(DeleteBehavior.Cascade);
+
 
         });
     }

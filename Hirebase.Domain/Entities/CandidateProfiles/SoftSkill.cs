@@ -1,6 +1,7 @@
 using Hirebase.Domain.Enums;
+using Hirebase.Domain.Entities.CandidateProfiles;
 
-namespace Hirebase.Domain.Entities.CandidateProfile;
+namespace Hirebase.Domain.Entities.CandidateProfiles;
 
 public class SoftSkill
 {
