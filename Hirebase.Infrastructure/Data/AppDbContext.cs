@@ -1,4 +1,4 @@
-using Hirebase.Domain.Entities;
+using Hirebase.Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hirebase.Infrastructure.Data;

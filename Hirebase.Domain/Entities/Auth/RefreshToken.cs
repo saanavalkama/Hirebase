@@ -1,4 +1,4 @@
-namespace Hirebase.Domain.Entities;
+namespace Hirebase.Domain.Entities.Auth;
 
 public class RefreshToken
 {

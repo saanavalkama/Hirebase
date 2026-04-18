@@ -1,6 +1,6 @@
 using Hirebase.Application.DTOs.Auth;
 using Hirebase.Application.Interfaces;
-using Hirebase.Domain.Entities;
+using Hirebase.Domain.Entities.Auth;
 using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
 

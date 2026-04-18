@@ -1,6 +1,6 @@
 using Hirebase.Domain.Enums;
 
-namespace Hirebase.Domain.Entities;
+namespace Hirebase.Domain.Entities.Auth;
 
 public class User
 {

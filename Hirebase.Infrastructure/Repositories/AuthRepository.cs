@@ -1,5 +1,5 @@
 using Hirebase.Application.Interfaces;
-using Hirebase.Domain.Entities;
+using Hirebase.Domain.Entities.Auth;
 using Hirebase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
