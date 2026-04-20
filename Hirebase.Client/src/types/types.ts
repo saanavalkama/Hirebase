@@ -8,6 +8,12 @@ export interface AuthResponse{
     accessToken:string
 }
 
+export interface MeResponse {
+    userId: string,
+    email: string,
+    role: UserRole,
+}
+
 export interface LoginRequest{
     email: string,
     password:string
@@ -76,8 +82,8 @@ export interface UpdateCandidateProfileRequest {
     salaryMin?: number,
     salaryMax?: number,
     availableFrom?: string,
-    softSkills: SoftSkillType[],
-    preferredRoles: PreferredRoleType[],
+    softSkills?: SoftSkillType[],
+    preferredRoles?: PreferredRoleType[],
     seniorityLevel?: SeniorityLevel,
     remotePreference?: RemotePreference,
 }
