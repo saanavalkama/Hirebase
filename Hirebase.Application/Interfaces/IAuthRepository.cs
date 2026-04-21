@@ -13,4 +13,5 @@ public interface IAuthRepository
     Task RevokeFamily(Guid familyId);
 
     Task RevokeAllByUserId(Guid userId);
+
 }

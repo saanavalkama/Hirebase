@@ -26,7 +26,7 @@ public class CandidateProfileController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
           ?? throw new UnauthorizedException("User not found");
 
-        var profile = _service.GetProfile(Guid.Parse(userId));
+        var profile = await _service.GetProfile(Guid.Parse(userId));
         return Ok(profile);
     }
 

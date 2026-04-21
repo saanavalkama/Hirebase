@@ -58,6 +58,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("logout-all")]
+    [Authorize]
     public async Task<IActionResult> LogoutAllDevices()
     {
         var rt = Request.Cookies["refreshToken"];

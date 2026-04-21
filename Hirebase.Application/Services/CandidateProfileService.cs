@@ -4,11 +4,12 @@ using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
 
+
 namespace Hirebase.Application.Services;
 
 public class CandidateProfileService : ICandidateProfileService
 {
-    private readonly ICandidateProfileRepository _repo;
+    private readonly ICandidateProfileRepository _repo; 
 
     public CandidateProfileService(ICandidateProfileRepository repo)
     {
@@ -27,49 +28,30 @@ public class CandidateProfileService : ICandidateProfileService
     return MapToDto(created);
     }
 
-    public async Task<CandidateProfileResponseDto>UpdateProfile(UpdateCandidateProfileDto dto,Guid userId)
-    {
-        var profile = await _repo.GetProfileByUserId(userId)
-            ?? throw new NotFoundException("Profile not found");
+    
 
-        if(dto.Name != null) profile.Name = dto.Name;
-        if(dto.Location != null) profile.Location = dto.Location;
-        if(dto.Bio != null) profile.Bio = dto.Bio;
-        if(dto.LinkedInUrl != null) profile.LinkedInUrl = dto.LinkedInUrl;
-        if(dto.PersonalSiteUrl != null) profile.PersonalSiteUrl = dto.PersonalSiteUrl;
-        if(dto.YearsOfExperience != null) profile.YearsOfExperience = dto.YearsOfExperience;
-        if(dto.SalaryMin != null) profile.SalaryMin = dto.SalaryMin;
-        if(dto.SalaryMax != null) profile.SalaryMax = dto.SalaryMax;
-        if(dto.AvailableFrom != null) profile.AvailableFrom = dto.AvailableFrom;
-        if(dto.SeniorityLevel != null) profile.SeniorityLevel = Enum.Parse<SeniorityLevel>(dto.SeniorityLevel);
-        if(dto.RemotePreference != null) profile.RemotePreference = Enum.Parse<RemotePreference>(dto.RemotePreference);
-        if(dto.SoftSkills != null)
-        {
-            profile.SoftSkills.Clear();
-            foreach(var skill in dto.SoftSkills)
-                profile.SoftSkills.Add(new SoftSkill
-                {
-                    Skill = Enum.Parse<SoftSkillType>(skill),
-                    CandidateProfileId = profile.Id
-                });
-        }
-        if(dto.PreferredRoles != null)
-        {
-            profile.PreferredRoles.Clear();
-            foreach(var role in dto.PreferredRoles)
-            profile.PreferredRoles.Add(new CandidatePreferredRole
-            {
-                    Role = Enum.Parse<PreferredRoleType>(role),
-                CandidateProfileId = profile.Id
-            });
-        }
+    public async Task<CandidateProfileResponseDto> UpdateProfile(UpdateCandidateProfileDto dto, Guid userId)
+{
+    var profile = await _repo.GetProfileByUserId(userId)
+        ?? throw new NotFoundException("Profile not found");
 
-        profile.UpdatedAt = DateTime.UtcNow;
+    if(dto.Name != null) profile.Name = dto.Name;
+    if(dto.Location != null) profile.Location = dto.Location;
+    if(dto.Bio != null) profile.Bio = dto.Bio;
+    if(dto.LinkedInUrl != null) profile.LinkedInUrl = dto.LinkedInUrl;
+    if(dto.PersonalSiteUrl != null) profile.PersonalSiteUrl = dto.PersonalSiteUrl;
+    if(dto.YearsOfExperience != null) profile.YearsOfExperience = dto.YearsOfExperience;
+    if(dto.SalaryMin != null) profile.SalaryMin = dto.SalaryMin;
+    if(dto.SalaryMax != null) profile.SalaryMax = dto.SalaryMax;
+    if(dto.AvailableFrom != null) profile.AvailableFrom = dto.AvailableFrom;
+    if(dto.SeniorityLevel != null) profile.SeniorityLevel = Enum.Parse<SeniorityLevel>(dto.SeniorityLevel);
+    if(dto.RemotePreference != null) profile.RemotePreference = Enum.Parse<RemotePreference>(dto.RemotePreference);
 
-        var updated = await _repo.UpdateProfile(profile);
-        return MapToDto(updated);
+    profile.UpdatedAt = DateTime.UtcNow;
 
-    }
+    var updated = await _repo.UpdateProfile(profile, dto.SoftSkills, dto.PreferredRoles);
+    return MapToDto(updated);
+}
 
     public async Task<CandidateProfileResponseDto> GetProfile(Guid userid)
     {

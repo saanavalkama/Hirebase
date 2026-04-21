@@ -11,9 +11,8 @@ public record UpdateCandidateProfileDto(
     int? SalaryMin,
     int? SalaryMax,
     DateOnly? AvailableFrom,
-    List<string> SoftSkills,
-    List<string> PreferredRoles,
-    DateTime UpdatedAt,
+    List<string>? SoftSkills,
+    List<string>? PreferredRoles,
     string? SeniorityLevel,
     string? RemotePreference
 );

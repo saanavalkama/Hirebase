@@ -5,7 +5,12 @@ namespace Hirebase.Application.Interfaces;
 public interface ICandidateProfileRepository
 {
     Task <CandidateProfile> CreateProfile(CandidateProfile cp);
-    Task <CandidateProfile>UpdateProfile(CandidateProfile cp);
+    Task <CandidateProfile>UpdateProfile(CandidateProfile cp, List<string>? SoftSkills, List<string>? PreferredRoles);
 
     Task<CandidateProfile?>GetProfileByUserId(Guid userId);
+
+
+    Task RemoveExistingSoftSkills(Guid pid);
+
+    Task RemoveExistingRoles(Guid pid);
 }
