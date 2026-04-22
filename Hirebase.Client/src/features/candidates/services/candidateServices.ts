@@ -12,5 +12,10 @@ export const candidateService = {
     updateProfile: async(data: UpdateCandidateProfileRequest):Promise<CandidateProfileResponse> => {
         const response = await api.patch("/api/candidate/profile",data)
         return response.data
+    },
+
+    connectGitHub: async () => {
+        const response = await api.get("/api/github/connect")
+        window.location.href = response.data.url
     }
 }

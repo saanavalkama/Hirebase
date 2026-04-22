@@ -1,5 +1,6 @@
 using Hirebase.Application.Interfaces;
 using Hirebase.Domain.Entities.Auth;
+using Hirebase.Domain.Utils;
 using Hirebase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,10 +34,13 @@ public class AuthRepository: IAuthRepository
     }
 
     public async Task<RefreshToken?> GetRefreshToken(string token)
+
+   
     {
+         var hash = HashUtils.ComputeSha256(token);
         return await _context.RefreshTokens
             .Include(r => r.User)
-            .FirstOrDefaultAsync(r => r.Token == token);
+            .FirstOrDefaultAsync(r => r.Token == hash);
     }
 
     public async Task RevokeRefreshToken(RefreshToken token)

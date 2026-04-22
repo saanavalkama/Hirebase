@@ -6,6 +6,15 @@ import { getErrorMessage } from "@/utils/getErrorMessage"
 import { useMe } from "@/features/auth/hooks/useAuthQueries"
 import axios from "axios"
 
+export const useConnectGitHub = () => {
+    return useMutation({
+        mutationFn: () => candidateService.connectGitHub(),
+        onError: (err) => {
+            toast.error(getErrorMessage(err, "Failed to connect GitHub"))
+        }
+    })
+}
+
 export const useUpdateProfile = () => {
     const queryClient = useQueryClient()
     const { data: me } = useMe()

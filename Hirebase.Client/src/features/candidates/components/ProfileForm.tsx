@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Link } from 'react-router-dom'
 import DatePickerField from './DatePickerField'
-import { useUpdateProfile } from '../hooks/useCandidateMutations'
+import { useConnectGitHub, useUpdateProfile } from '../hooks/useCandidateMutations'
 import { useMe } from '@/features/auth/hooks/useAuthQueries'
 import { useCandidateProfile } from '../hooks/useCandidateQuery'
 import { useEffect } from 'react'
@@ -97,6 +97,7 @@ export default function ProfileForm() {
   })
 
   const { mutate: updateProfile, isPending, isError } = useUpdateProfile()
+  const { mutate: connectGitHub } = useConnectGitHub()
   const { data: me } = useMe()
   const { data: profile } = useCandidateProfile()
 
@@ -194,7 +195,9 @@ export default function ProfileForm() {
               Help recruiters find you by filling in your details.
             </p>
           </div>
-
+            <div>
+                <Button type="button" onClick={()=>connectGitHub()}>Connect GitHub</Button>
+            </div>
           <div className="bg-white/[0.04] rounded-2xl border border-white/[0.07] p-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Personal + Links */}

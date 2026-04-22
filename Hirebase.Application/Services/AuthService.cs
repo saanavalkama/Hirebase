@@ -4,6 +4,8 @@ using Hirebase.Domain.Entities.Auth;
 using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
+using Hirebase.Domain.Utils; 
+
 
 namespace Hirebase.Application.Services;
 public class AuthService : IAuthService
@@ -14,14 +16,22 @@ public class AuthService : IAuthService
     private readonly IJwtService _jwt;
 
     private readonly ICandidateProfileRepository _candidateRepo;
+
+    private readonly ITokenEncryptionService _tokenEncryptionService;
     
-    public AuthService(IAuthRepository repo, IPasswordHasher hasher, IJwtService jwt, ICandidateProfileRepository canidateRepo)
+    public AuthService(
+        IAuthRepository repo, 
+        IPasswordHasher hasher, 
+        IJwtService jwt, 
+        ICandidateProfileRepository canidateRepo,
+        ITokenEncryptionService tokenEncryptionService
+        )
     {
         _repo = repo;
         _hasher = hasher;
         _jwt = jwt;
         _candidateRepo = canidateRepo;
-
+        _tokenEncryptionService = tokenEncryptionService;
     }
 
     public async Task<AuthResponseDto> Register(RegisterDto dto)
@@ -107,16 +117,19 @@ public class AuthService : IAuthService
 
     private async Task<string> CreateAndSaveRefreshToken(Guid userId, Guid familyId)
     {
+        var rawToken = _jwt.GenerateRefreshToken();
+
         var refreshToken = new RefreshToken
         {
-            Token = _jwt.GenerateRefreshToken(),
+            Token = _tokenEncryptionService.Encrypt(rawToken),
+            TokenHash = HashUtils.ComputeSha256(rawToken),
             UserId = userId,
             FamilyId = familyId
         };
 
         await _repo.SaveRefreshToken(refreshToken);
 
-        return refreshToken.Token;
+        return rawToken;
         
     }
 }

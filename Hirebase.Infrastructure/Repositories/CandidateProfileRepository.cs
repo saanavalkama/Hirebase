@@ -2,7 +2,6 @@ using Hirebase.Application.Interfaces;
 using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 
 namespace Hirebase.Infrastructure.Repositories;

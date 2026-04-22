@@ -12,6 +12,7 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hirebase.Application.Validators;
+using Hirebase.Application.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +21,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+
 //validation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
+
+var githubSettings = builder.Configuration.GetSection("GitHub").Get<GitHubSettings>()
+    ?? throw new InvalidOperationException("GitHub settings missing");
+
+if(string.IsNullOrEmpty(githubSettings.ClientId))
+    throw new InvalidOperationException("GitHub ClientId missing");
+if(string.IsNullOrEmpty(githubSettings.ClientSecret))
+    throw new InvalidOperationException("GitHub ClientSecret missing");
+
+builder.Services.AddSingleton(githubSettings);
 
 builder.Services.AddOptions<ConnectionSettings>()
     .BindConfiguration("ConnectionStrings")
@@ -35,6 +47,13 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICandidateProfileRepository, CandidateProfileRepository>();
 builder.Services.AddScoped<ICandidateProfileService, CandidateProfileService>();
+builder.Services.AddScoped<IGitHubOAuthService, GitHubOAuthService>();
+builder.Services.AddScoped<IGitHubProfileRepository, GitHubProfileRepository>();
+builder.Services.AddHttpClient<GitHubOAuthService>();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddDataProtection();
+builder.Services.AddScoped<ITokenEncryptionService, TokenEncryptionService>();
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 
@@ -77,6 +96,8 @@ app.UseCors("AllowClient");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseSwagger();
+app.UseSwaggerUI();
 app.Run();
 
 public partial class Program{}
