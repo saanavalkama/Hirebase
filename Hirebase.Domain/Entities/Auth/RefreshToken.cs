@@ -7,6 +7,8 @@ public class RefreshToken
     public Guid FamilyId {get;set;} = Guid.NewGuid();
     public string Token {get;set;} = string.Empty;
 
+    public string TokenHash {get;set;} = string.Empty;
+
     public DateTime ExpiresAt {get;set;} = DateTime.UtcNow.AddDays(7);
 
     public DateTime? RevokedAt {get;set;}
