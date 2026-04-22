@@ -1,4 +1,4 @@
-namespace Hirebase.Domain.Entities.Auth;
+namespace Hirebase.Domain.Entities;
 
 public class RefreshToken
 {
@@ -6,8 +6,6 @@ public class RefreshToken
 
     public Guid FamilyId {get;set;} = Guid.NewGuid();
     public string Token {get;set;} = string.Empty;
-
-    public string TokenHash {get;set;} = string.Empty;
 
     public DateTime ExpiresAt {get;set;} = DateTime.UtcNow.AddDays(7);
 
