@@ -26,15 +26,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
 
-var githubSettings = builder.Configuration.GetSection("GitHub").Get<GitHubSettings>()
-    ?? throw new InvalidOperationException("GitHub settings missing");
+builder.Services.AddOptions<GitHubSettings>()
+    .BindConfiguration("GitHub")
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
-if(string.IsNullOrEmpty(githubSettings.ClientId))
-    throw new InvalidOperationException("GitHub ClientId missing");
-if(string.IsNullOrEmpty(githubSettings.ClientSecret))
-    throw new InvalidOperationException("GitHub ClientSecret missing");
-
-builder.Services.AddSingleton(githubSettings);
+builder.Services.AddSingleton(sp =>
+    sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<GitHubSettings>>().Value);
 
 builder.Services.AddOptions<ConnectionSettings>()
     .BindConfiguration("ConnectionStrings")
