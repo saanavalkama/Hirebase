@@ -1,4 +1,4 @@
-using Hirebase.Domain.Entities.Auth;
+using Hirebase.Domain.Entities;
 
 namespace Hirebase.Application.Interfaces;
 
@@ -13,5 +13,4 @@ public interface IAuthRepository
     Task RevokeFamily(Guid familyId);
 
     Task RevokeAllByUserId(Guid userId);
-
 }

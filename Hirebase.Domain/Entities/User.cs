@@ -1,7 +1,6 @@
 using Hirebase.Domain.Enums;
-using Hirebase.Domain.Entities.CandidateProfiles;
 
-namespace Hirebase.Domain.Entities.Auth;
+namespace Hirebase.Domain.Entities;
 
 public class User
 {
@@ -16,5 +15,4 @@ public class User
     public DateTime UpdatedAt {get;set;} = DateTime.UtcNow;
 
     public ICollection<RefreshToken> RefreshTokens {get;set;} = [];
-
 }
