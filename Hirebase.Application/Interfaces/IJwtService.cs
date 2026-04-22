@@ -1,4 +1,4 @@
-using Hirebase.Domain.Entities;
+using Hirebase.Domain.Entities.Auth;
 
 namespace Hirebase.Application.Interfaces;
 

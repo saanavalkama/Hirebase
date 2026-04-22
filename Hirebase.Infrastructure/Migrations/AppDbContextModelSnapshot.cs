@@ -22,7 +22,55 @@ namespace Hirebase.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Hirebase.Domain.Entities.RefreshToken", b =>
+            modelBuilder.Entity("GitHubProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AccessToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CandidateProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FetchStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Followers")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GitHubId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("GitHubUsername")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastFetchedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ProfileUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PublicRepos")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateProfileId")
+                        .IsUnique();
+
+                    b.ToTable("GitHubProfiles");
+                });
+
+            modelBuilder.Entity("Hirebase.Domain.Entities.Auth.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,6 +92,10 @@ namespace Hirebase.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -59,7 +111,7 @@ namespace Hirebase.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("Hirebase.Domain.Entities.User", b =>
+            modelBuilder.Entity("Hirebase.Domain.Entities.Auth.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,9 +142,117 @@ namespace Hirebase.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Hirebase.Domain.Entities.RefreshToken", b =>
+            modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.CandidatePreferredRole", b =>
                 {
-                    b.HasOne("Hirebase.Domain.Entities.User", "User")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CandidateProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateProfileId");
+
+                    b.ToTable("PreferredRoles");
+                });
+
+            modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("AvailableFrom")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CvUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LinkedInUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PersonalSiteUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("RemotePreference")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SalaryMax")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SalaryMin")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SeniorityLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("YearsOfExperience")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("CandidateProfiles");
+                });
+
+            modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.SoftSkill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CandidateProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Skill")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateProfileId");
+
+                    b.ToTable("SoftSkills");
+                });
+
+            modelBuilder.Entity("GitHubProfile", b =>
+                {
+                    b.HasOne("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", "CandidateProfile")
+                        .WithOne("GitHubProfile")
+                        .HasForeignKey("GitHubProfile", "CandidateProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CandidateProfile");
+                });
+
+            modelBuilder.Entity("Hirebase.Domain.Entities.Auth.RefreshToken", b =>
+                {
+                    b.HasOne("Hirebase.Domain.Entities.Auth.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -101,9 +261,51 @@ namespace Hirebase.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Hirebase.Domain.Entities.User", b =>
+            modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.CandidatePreferredRole", b =>
+                {
+                    b.HasOne("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", "CandidateProfile")
+                        .WithMany("PreferredRoles")
+                        .HasForeignKey("CandidateProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CandidateProfile");
+                });
+
+            modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", b =>
+                {
+                    b.HasOne("Hirebase.Domain.Entities.Auth.User", "User")
+                        .WithOne()
+                        .HasForeignKey("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.SoftSkill", b =>
+                {
+                    b.HasOne("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", "CandidateProfile")
+                        .WithMany("SoftSkills")
+                        .HasForeignKey("CandidateProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CandidateProfile");
+                });
+
+            modelBuilder.Entity("Hirebase.Domain.Entities.Auth.User", b =>
                 {
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", b =>
+                {
+                    b.Navigation("GitHubProfile");
+
+                    b.Navigation("PreferredRoles");
+
+                    b.Navigation("SoftSkills");
                 });
 #pragma warning restore 612, 618
         }

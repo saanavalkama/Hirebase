@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Hirebase.Application.Interfaces;
-using Hirebase.Domain.Entities;
+using Hirebase.Domain.Entities.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 

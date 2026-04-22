@@ -1,8 +1,11 @@
 using Hirebase.Application.DTOs.Auth;
 using Hirebase.Application.Interfaces;
-using Hirebase.Domain.Entities;
+using Hirebase.Domain.Entities.Auth;
+using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
+using Hirebase.Domain.Utils; 
+
 
 namespace Hirebase.Application.Services;
 public class AuthService : IAuthService
@@ -11,13 +14,24 @@ public class AuthService : IAuthService
     private readonly IPasswordHasher _hasher;
 
     private readonly IJwtService _jwt;
+
+    private readonly ICandidateProfileRepository _candidateRepo;
+
+    private readonly ITokenEncryptionService _tokenEncryptionService;
     
-    public AuthService(IAuthRepository repo, IPasswordHasher hasher, IJwtService jwt)
+    public AuthService(
+        IAuthRepository repo, 
+        IPasswordHasher hasher, 
+        IJwtService jwt, 
+        ICandidateProfileRepository canidateRepo,
+        ITokenEncryptionService tokenEncryptionService
+        )
     {
         _repo = repo;
         _hasher = hasher;
         _jwt = jwt;
-
+        _candidateRepo = canidateRepo;
+        _tokenEncryptionService = tokenEncryptionService;
     }
 
     public async Task<AuthResponseDto> Register(RegisterDto dto)
@@ -38,6 +52,11 @@ public class AuthService : IAuthService
         };
 
         var createdUser = await _repo.CreateUser(user);
+        if(role == UserRole.CANDIDATE)
+        {
+            await _candidateRepo.CreateProfile(new CandidateProfile {UserId = createdUser.Id});
+        }
+        
 
         var accessToken = _jwt.GenerateAccessToken(user);
 
@@ -98,16 +117,19 @@ public class AuthService : IAuthService
 
     private async Task<string> CreateAndSaveRefreshToken(Guid userId, Guid familyId)
     {
+        var rawToken = _jwt.GenerateRefreshToken();
+
         var refreshToken = new RefreshToken
         {
-            Token = _jwt.GenerateRefreshToken(),
+            Token = _tokenEncryptionService.Encrypt(rawToken),
+            TokenHash = HashUtils.ComputeSha256(rawToken),
             UserId = userId,
             FamilyId = familyId
         };
 
         await _repo.SaveRefreshToken(refreshToken);
 
-        return refreshToken.Token;
+        return rawToken;
         
     }
 }

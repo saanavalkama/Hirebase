@@ -2,6 +2,8 @@ using Hirebase.Application.DTOs.Auth;
 using Hirebase.Application.Interfaces;
 using Hirebase.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 
 namespace Hirebase.API.Controllers;
@@ -11,10 +13,10 @@ namespace Hirebase.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-
+    
     public AuthController(IAuthService authService)
     {
-        _authService = authService;
+       _authService = authService;
     }
 
     [HttpPost("register")]
@@ -46,6 +48,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("logout")]
+    [Authorize]
     public async Task<IActionResult> Logout()
     {
         var rt = Request.Cookies["refreshToken"];
@@ -55,12 +58,24 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("logout-all")]
+    [Authorize]
     public async Task<IActionResult> LogoutAllDevices()
     {
         var rt = Request.Cookies["refreshToken"];
         if (rt != null) await _authService.LogoutAllDevices(rt);
         Response.Cookies.Delete("refreshToken");
         return NoContent();
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public IActionResult Me()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        var role = User.FindFirstValue(ClaimTypes.Role);
+
+        return Ok(new { userId, email, role });
     }
 
     // TODO: set Secure = true and SameSite = Strict in production
@@ -74,4 +89,6 @@ public class AuthController : ControllerBase
             Expires = DateTime.UtcNow.AddDays(7)
         });
     }
+
+
 }
