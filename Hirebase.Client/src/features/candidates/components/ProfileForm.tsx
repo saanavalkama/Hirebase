@@ -2,7 +2,6 @@ import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import {
   Controller,
   useForm,
-  type Resolver,
   type SubmitHandler,
 } from 'react-hook-form'
 import FormField from '@/components/shared/FormField'
@@ -197,6 +196,9 @@ export default function ProfileForm() {
           </div>
             <div>
                 <Button type="button" onClick={()=>connectGitHub()}>Connect GitHub</Button>
+            </div>
+            <div>
+                {isError && <p>something went wrong while creating profile</p>}
             </div>
           <div className="bg-white/[0.04] rounded-2xl border border-white/[0.07] p-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -526,8 +528,9 @@ export default function ProfileForm() {
                 <Button
                   type="submit"
                   className="w-full bg-teal-600 hover:bg-teal-500 text-white rounded-full py-5 text-sm font-medium shadow-lg shadow-teal-500/20 transition-all"
+                  disabled ={isPending}
                 >
-                  Save profile
+                  {isPending ? 'Saving...' : 'Save Profile'}
                 </Button>
               </div>
             </form>
