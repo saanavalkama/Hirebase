@@ -3,6 +3,7 @@ using Hirebase.Application.Interfaces;
 using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
+using System.Text.Json;
 
 
 namespace Hirebase.Application.Services;
@@ -78,7 +79,32 @@ public class CandidateProfileService : ICandidateProfileService
         profile.CreatedAt,
         profile.UpdatedAt,
         profile.SeniorityLevel?.ToString(),
-        profile.RemotePreference?.ToString()
+        profile.RemotePreference?.ToString(),
+        MapGitHubStatus(profile.GitHubProfile)
     );
+
+    private GitHubStatusDto MapGitHubStatus(GitHubProfile? gitHub)
+{
+    if (gitHub == null)
+        return new GitHubStatusDto(false, "NotConnected", null, null);
+
+    var nextRefresh = gitHub.LastFetchedAt?.AddDays(7);
+
+    var signals = gitHub.Signals == null ? null : new GitHubSignalsDto(
+        gitHub.Signals.ActivityScore,
+        gitHub.Signals.RepoMaturityScore,
+        gitHub.Signals.PopularityScore,
+        JsonSerializer.Deserialize<List<string>>(gitHub.Signals.TopLanguages) ?? [],
+        gitHub.Signals.ExternalPrCount,
+        gitHub.Signals.CalculatedAt
+    );
+
+    return new GitHubStatusDto(
+        true,
+        gitHub.FetchStatus.ToString(),
+        nextRefresh,
+        signals
+    );
+}
 
 }

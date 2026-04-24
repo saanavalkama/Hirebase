@@ -17,6 +17,8 @@ public class AppDbContext : DbContext{
     public DbSet<User> Users {get;set;}
     public DbSet<RefreshToken> RefreshTokens {get;set;}
     public DbSet<GitHubProfile>GitHubProfiles {get;set;}
+
+    public DbSet<GitHubSignals>GitHubSignals {get;set;}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
 
 
@@ -78,6 +80,12 @@ public class AppDbContext : DbContext{
               .WithOne(c => c.GitHubProfile)
               .HasForeignKey<GitHubProfile>(g => g.CandidateProfileId)
               .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<GitHubSignals>(g =>
+        {
+            g.HasKey(g => g.Id);
+            g.HasOne(g => g.GitHubProfile).WithOne(p => p.Signals).HasForeignKey<GitHubSignals>(s => s.GitHubProfileId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

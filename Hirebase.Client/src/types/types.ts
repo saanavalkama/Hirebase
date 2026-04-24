@@ -1,3 +1,5 @@
+import type { $ZodStringInternals } from "zod/v4/core"
+
 export interface RegisterRequest{
     email:string,
     password: string,
@@ -69,7 +71,33 @@ export interface CandidateProfileResponse {
     remotePreference?: RemotePreference,
     createdAt: string,
     updatedAt: string,
+    gitHub: GitHub
 }
+
+export interface GitHub{
+    hasConnected: boolean
+    fetchStatus: FetchStatus
+    nextRefreshAvailable: string
+    signals: Signals
+}
+
+export interface Signals{
+    activityScore: number
+    calculatedAt: string
+    externalPrCount: number
+    popularityScore: number
+    repoMaturityScore: number
+    topLanguages:string[]
+}
+
+export type FetchStatus = 
+    | "Pending" 
+    | "Processing" 
+   | "Done"
+    | "Failed"
+
+
+
 
 export interface UpdateCandidateProfileRequest {
     name?: string,

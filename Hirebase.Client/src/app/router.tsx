@@ -1,6 +1,6 @@
 import Login from '@/features/auth/components/Login';
 import Register from '@/features/auth/components/Register';
-import ProfileForm from '@/features/candidates/components/ProfileForm';
+import ProfileForm from '@/features/candidates/pages/ProfileForm';
 import CandidateDashboard from '@/features/candidates/pages/CandidateDashboard';
 import LandingPage from '@/pages/LandingPage';
 import {createBrowserRouter} from 'react-router-dom';

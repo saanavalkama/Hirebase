@@ -40,7 +40,16 @@ public class GitHubController : ControllerBase
             throw new BadRequestError("Invalid state parameter");
 
         await _githubService.HandleCallback(code, userId);
-        return Redirect("http://localhost:5173/app/candidate/editProfile");
+        return Redirect("http://localhost:5176/app/candidate/editProfile");
+    }
+
+    [HttpPost("refreshData")]
+    [Authorize]
+    public async Task<IActionResult> Refresh()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedException("User not found");
+        await _githubService.RefreshAsync(Guid.Parse(userId));
+        return Ok(new {message ="Refresh queued"});
     }
 
 }

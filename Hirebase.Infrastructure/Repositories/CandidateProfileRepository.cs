@@ -27,6 +27,7 @@ public class CandidateProfileRepository : ICandidateProfileRepository
         return await _context.CandidateProfiles
           .Include(p => p.SoftSkills)
           .Include(p => p.PreferredRoles)
+          .Include(p => p.GitHubProfile).ThenInclude(p => p.Signals)
           .FirstOrDefaultAsync(p => p.UserId == userId);
     }
 

@@ -19,4 +19,8 @@ public class GitHubProfile
     public DateTime? LastFetchedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    public string? RawDataJson {get;set;}
+
+    public GitHubSignals? Signals {get;set;}
+
 }

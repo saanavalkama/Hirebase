@@ -15,6 +15,22 @@ export const useConnectGitHub = () => {
     })
 }
 
+export const useRefreshGitHub = () => {
+    const queryClient = useQueryClient()
+    const { data: me } = useMe()
+
+    return useMutation({
+        mutationFn: () => candidateService.refreshGitHubData(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["profile", me?.userId] })
+            toast.success("GitHub refresh queued")
+        },
+        onError: (err) => {
+            toast.error(getErrorMessage(err, "Failed to refresh GitHub data"))
+        }
+    })
+}
+
 export const useUpdateProfile = () => {
     const queryClient = useQueryClient()
     const { data: me } = useMe()

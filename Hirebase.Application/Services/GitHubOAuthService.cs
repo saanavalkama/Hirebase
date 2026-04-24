@@ -6,6 +6,7 @@ using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Hirebase.Domain.Exceptions;
 
 
 
@@ -110,6 +111,25 @@ public class GitHubOAuthService : IGitHubOAuthService
 
         
     }
+
+    public async Task RefreshAsync(Guid userId)
+{
+    var profile = await _candidateRepo.GetProfileByUserId(userId)
+        ?? throw new NotFoundException("Candidate not found");
+
+    var github = await _githubRepo.GetByProfileId(profile.Id)
+        ?? throw new NotFoundException("GitHub not connected");
+
+    if (github.LastFetchedAt.HasValue && 
+        github.LastFetchedAt.Value.AddDays(2) > DateTime.UtcNow)
+    {
+        throw new BadRequestError(
+            $"Next refresh available at {github.LastFetchedAt.Value.AddDays(7):u}");
+    }
+
+    github.FetchStatus = FetchStatus.Pending;
+    await _githubRepo.Update(github);
+}
 
   public record GitHubUserResponse(
     [property: JsonPropertyName("login")] string Login,
