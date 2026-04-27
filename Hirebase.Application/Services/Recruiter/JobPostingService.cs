@@ -10,27 +10,35 @@ namespace Hirebase.Application.Services.Recruiter;
 public class JobPostingService : IJobPostingService
 {
     private readonly IJobPostingRepository _repo;
+    private readonly IOrganizationRepository _orgRepo;
 
-    public JobPostingService(IJobPostingRepository repo)
+    public JobPostingService(IJobPostingRepository repo, IOrganizationRepository orgRepo)
     {
         _repo = repo;
+        _orgRepo = orgRepo;
     }
 
-    public async Task<JobPostingResponseDto> Create(CreateJobPostingDto dto)
+    public async Task<JobPostingResponseDto> Create(CreateJobPostingDto dto, Guid recruiterProfileId)
     {
+        var org = await _orgRepo.GetById(dto.OrganizationId)
+            ?? throw new NotFoundException("Organization");
+
+        if (org.RecruiterProfileId != recruiterProfileId)
+            throw new ForbiddenException("You do not own this organization");
+
         var posting = new JobPosting
         {
             OrganizationId = dto.OrganizationId,
             Title = dto.Title,
             Description = dto.Description,
-            SeniorityLevel = dto.SeniorityLevel != null 
-                ? Enum.Parse<SeniorityLevel>(dto.SeniorityLevel) 
+            SeniorityLevel = dto.SeniorityLevel != null
+                ? Enum.Parse<SeniorityLevel>(dto.SeniorityLevel)
                 : null,
             SalaryMin = dto.SalaryMin,
             SalaryMax = dto.SalaryMax,
             Location = dto.Location,
-            RemotePreference = dto.RemotePreference != null 
-                ? Enum.Parse<RemotePreference>(dto.RemotePreference) 
+            RemotePreference = dto.RemotePreference != null
+                ? Enum.Parse<RemotePreference>(dto.RemotePreference)
                 : null,
             LastApplicationDay = dto.LastApplicationDay,
             Status = Enum.Parse<JobPostingStatus>(dto.JobPostingStatus)
@@ -40,10 +48,13 @@ public class JobPostingService : IJobPostingService
         return MapToDto(saved);
     }
 
-    public async Task<JobPostingResponseDto> Update(UpdateJobPostingDto dto, Guid id)
+    public async Task<JobPostingResponseDto> Update(UpdateJobPostingDto dto, Guid id, Guid recruiterProfileId)
     {
         var posting = await _repo.GetById(id)
             ?? throw new NotFoundException("JobPosting");
+
+        if (posting.Organization.RecruiterProfileId != recruiterProfileId)
+            throw new ForbiddenException("You do not own this job posting");
 
         if(dto.Title != null) posting.Title = dto.Title;
         if(dto.Description != null) posting.Description = dto.Description;
@@ -60,8 +71,14 @@ public class JobPostingService : IJobPostingService
         return MapToDto(updated);
     }
 
-    public async Task Delete(Guid id)
+    public async Task Delete(Guid id, Guid recruiterProfileId)
     {
+        var posting = await _repo.GetById(id)
+            ?? throw new NotFoundException("JobPosting");
+
+        if (posting.Organization.RecruiterProfileId != recruiterProfileId)
+            throw new ForbiddenException("You do not own this job posting");
+
         await _repo.Delete(id);
     }
 

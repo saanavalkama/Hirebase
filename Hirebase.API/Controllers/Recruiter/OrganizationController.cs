@@ -48,14 +48,20 @@ public class OrganizationController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<IActionResult> Update([FromBody] UpdateOrganizationDto dto, Guid id)
     {
-        var org = await _service.Update(dto, id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new UnauthorizedException("User not found");
+        var recruiter = await _recruiterService.GetRecruiterProfileByUserId(Guid.Parse(userId));
+        var org = await _service.Update(dto, id, recruiter.Id);
         return Ok(org);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _service.Delete(id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new UnauthorizedException("User not found");
+        var recruiter = await _recruiterService.GetRecruiterProfileByUserId(Guid.Parse(userId));
+        await _service.Delete(id, recruiter.Id);
         return NoContent();
     }
 }

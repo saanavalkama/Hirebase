@@ -34,14 +34,16 @@ public class OrganizationService : IOrganizationService
     public async Task<List<OrganizationResponseDto>>GetAllByRecruiterId(Guid rid)
     {
         var orgs = await _repo.GetAllByRecruiterProfileId(rid);
-        if(orgs == null) throw new NotFoundException("Organization");
         return orgs.Select(o => MapToDto(o)).ToList();
     }
 
-    public async Task<OrganizationResponseDto>Update(UpdateOrganizationDto dto, Guid id)
+    public async Task<OrganizationResponseDto>Update(UpdateOrganizationDto dto, Guid id, Guid recruiterProfileId)
     {
-        var org = await _repo.GetById(id);
-        if(org == null) throw new NotFoundException("Organization");
+        var org = await _repo.GetById(id)
+            ?? throw new NotFoundException("Organization");
+
+        if (org.RecruiterProfileId != recruiterProfileId)
+            throw new ForbiddenException("You do not own this organization");
 
         if(dto.Name != null) org.Name = dto.Name;
         if(dto.WebsiteUrl != null) org.WebsiteUrl = dto.WebsiteUrl;
@@ -52,9 +54,15 @@ public class OrganizationService : IOrganizationService
         return MapToDto(updated);
     }
 
-    public async Task Delete(Guid id)
+    public async Task Delete(Guid id, Guid recruiterProfileId)
     {
-    await _repo.Delete(id);
+        var org = await _repo.GetById(id)
+            ?? throw new NotFoundException("Organization");
+
+        if (org.RecruiterProfileId != recruiterProfileId)
+            throw new ForbiddenException("You do not own this organization");
+
+        await _repo.Delete(id);
     }
 
     private OrganizationResponseDto MapToDto(Organization org) => new(

@@ -7,7 +7,7 @@ public interface IOrganizationService
     Task<OrganizationResponseDto>Create(CreateOrganizationDto dto,Guid rid);
     Task<List<OrganizationResponseDto>>GetAllByRecruiterId(Guid rid);
 
-    Task<OrganizationResponseDto>Update(UpdateOrganizationDto dto, Guid id);
+    Task<OrganizationResponseDto>Update(UpdateOrganizationDto dto, Guid id, Guid recruiterProfileId);
 
-    Task Delete(Guid id);
+    Task Delete(Guid id, Guid recruiterProfileId);
 }

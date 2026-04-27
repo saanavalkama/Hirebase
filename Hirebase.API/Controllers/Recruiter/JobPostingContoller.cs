@@ -23,20 +23,22 @@ public class JobPostingController : ControllerBase
         _recruiterService = recruiterService;
     }
 
+    private Guid GetRecruiterUserId() =>
+        Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new UnauthorizedException("User not found"));
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateJobPostingDto dto)
     {
-        var job = await _service.Create(dto);
+        var recruiter = await _recruiterService.GetRecruiterProfileByUserId(GetRecruiterUserId());
+        var job = await _service.Create(dto, recruiter.Id);
         return Ok(job);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new UnauthorizedException("User not found");
-
-        var recruiter = await _recruiterService.GetRecruiterProfileByUserId(Guid.Parse(userId));
+        var recruiter = await _recruiterService.GetRecruiterProfileByUserId(GetRecruiterUserId());
         var postings = await _service.GetByRecruiterProfileId(recruiter.Id);
         return Ok(postings);
     }
@@ -51,14 +53,16 @@ public class JobPostingController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<IActionResult> Update([FromBody] UpdateJobPostingDto dto, Guid id)
     {
-        var posting = await _service.Update(dto, id);
+        var recruiter = await _recruiterService.GetRecruiterProfileByUserId(GetRecruiterUserId());
+        var posting = await _service.Update(dto, id, recruiter.Id);
         return Ok(posting);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _service.Delete(id);
+        var recruiter = await _recruiterService.GetRecruiterProfileByUserId(GetRecruiterUserId());
+        await _service.Delete(id, recruiter.Id);
         return NoContent();
     }
 }
