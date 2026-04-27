@@ -40,7 +40,7 @@ public class AuthRepository: IAuthRepository
          var hash = HashUtils.ComputeSha256(token);
         return await _context.RefreshTokens
             .Include(r => r.User)
-            .FirstOrDefaultAsync(r => r.Token == hash);
+            .FirstOrDefaultAsync(r => r.TokenHash == hash);
     }
 
     public async Task RevokeRefreshToken(RefreshToken token)

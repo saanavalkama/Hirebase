@@ -18,5 +18,6 @@ public record CandidateProfileResponseDto(
     DateTime CreatedAt,
     DateTime UpdatedAt,
     string? SeniorityLevel,
-    string? RemotePreference
+    string? RemotePreference,
+    GitHubStatusDto GitHub
 );

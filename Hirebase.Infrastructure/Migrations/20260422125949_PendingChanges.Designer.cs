@@ -3,6 +3,7 @@ using System;
 using Hirebase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hirebase.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260422125949_PendingChanges")]
+    partial class PendingChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,9 +64,6 @@ namespace Hirebase.Infrastructure.Migrations
 
                     b.Property<int>("PublicRepos")
                         .HasColumnType("integer");
-
-                    b.Property<string>("RawDataJson")
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -226,42 +226,6 @@ namespace Hirebase.Infrastructure.Migrations
                     b.ToTable("CandidateProfiles");
                 });
 
-            modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.GitHubSignals", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ActivityScore")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CalculatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("ExternalPrCount")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("GitHubProfileId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("PopularityScore")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RepoMaturityScore")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TopLanguages")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GitHubProfileId")
-                        .IsUnique();
-
-                    b.ToTable("GitHubSignals");
-                });
-
             modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.SoftSkill", b =>
                 {
                     b.Property<Guid>("Id")
@@ -325,17 +289,6 @@ namespace Hirebase.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.GitHubSignals", b =>
-                {
-                    b.HasOne("GitHubProfile", "GitHubProfile")
-                        .WithOne("Signals")
-                        .HasForeignKey("Hirebase.Domain.Entities.CandidateProfiles.GitHubSignals", "GitHubProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("GitHubProfile");
-                });
-
             modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.SoftSkill", b =>
                 {
                     b.HasOne("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", "CandidateProfile")
@@ -345,11 +298,6 @@ namespace Hirebase.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("CandidateProfile");
-                });
-
-            modelBuilder.Entity("GitHubProfile", b =>
-                {
-                    b.Navigation("Signals");
                 });
 
             modelBuilder.Entity("Hirebase.Domain.Entities.Auth.User", b =>

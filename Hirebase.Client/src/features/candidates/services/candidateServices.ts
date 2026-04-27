@@ -17,5 +17,9 @@ export const candidateService = {
     connectGitHub: async () => {
         const response = await api.get("/api/github/connect")
         window.location.href = response.data.url
+    },
+
+    refreshGitHubData: async (): Promise<void> => {
+        await api.post("/api/github/refreshData")
     }
 }

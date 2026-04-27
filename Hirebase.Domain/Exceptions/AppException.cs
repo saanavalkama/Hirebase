@@ -24,9 +24,9 @@ public class UnauthorizedException : Exception
         : base(message) { }
 }
 
-public class BadRequestError : Exception
+public class BadRequestException: Exception
 {
-    public BadRequestError(string message) : base(message)
+    public BadRequestException(string message) : base(message)
     {
         
     }

@@ -1,6 +1,8 @@
 using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 
+namespace Hirebase.Domain.Entities.CandidateProfiles;
+
 public class GitHubProfile
 {
     public Guid Id {get;set;} = Guid.NewGuid();
@@ -18,5 +20,9 @@ public class GitHubProfile
     public FetchStatus FetchStatus { get; set; } = FetchStatus.Pending;
     public DateTime? LastFetchedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public string? RawDataJson {get;set;}
+
+    public GitHubSignals? Signals {get;set;}
 
 }

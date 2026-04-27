@@ -22,11 +22,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Link } from 'react-router-dom'
-import DatePickerField from './DatePickerField'
-import { useConnectGitHub, useUpdateProfile } from '../hooks/useCandidateMutations'
+import DatePickerField from '../components/DatePickerField'
+import { useConnectGitHub, useRefreshGitHub, useUpdateProfile } from '../hooks/useCandidateMutations'
 import { useMe } from '@/features/auth/hooks/useAuthQueries'
 import { useCandidateProfile } from '../hooks/useCandidateQuery'
 import { useEffect } from 'react'
+import GitHubData from '../components/GitHubData'
 
 const SOFT_SKILLS = [
   'Communication',
@@ -97,6 +98,7 @@ export default function ProfileForm() {
 
   const { mutate: updateProfile, isPending, isError } = useUpdateProfile()
   const { mutate: connectGitHub } = useConnectGitHub()
+  const { mutate: refreshGitHub } = useRefreshGitHub()
   const { data: me } = useMe()
   const { data: profile } = useCandidateProfile()
 
@@ -161,6 +163,8 @@ export default function ProfileForm() {
     updateProfile(payload)
   }
 
+  console.log(profile)
+
   return (
     <div className="min-h-screen flex flex-col bg-[#18181f] text-stone-200">
       <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#18181f]/80 backdrop-blur-md">
@@ -194,12 +198,13 @@ export default function ProfileForm() {
               Help recruiters find you by filling in your details.
             </p>
           </div>
-            <div>
-                <Button type="button" onClick={()=>connectGitHub()}>Connect GitHub</Button>
-            </div>
+            <GitHubData data={profile?.gitHub} onConnect={() => connectGitHub()} onRefresh={() => refreshGitHub()} />
             <div>
                 {isError && <p>something went wrong while creating profile</p>}
             </div>
+          <p className="text-[11px] text-stone-500 text-center mb-4">
+            GitHub signals are fetched automatically once a week. You can trigger a manual refresh every two days.
+          </p>
           <div className="bg-white/[0.04] rounded-2xl border border-white/[0.07] p-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Personal + Links */}

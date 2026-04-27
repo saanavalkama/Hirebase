@@ -27,6 +27,7 @@ public class CandidateProfileRepository : ICandidateProfileRepository
         return await _context.CandidateProfiles
           .Include(p => p.SoftSkills)
           .Include(p => p.PreferredRoles)
+          .Include(p => p.GitHubProfile).ThenInclude(p => p.Signals)
           .FirstOrDefaultAsync(p => p.UserId == userId);
     }
 
@@ -66,16 +67,5 @@ public class CandidateProfileRepository : ICandidateProfileRepository
     return profile;
 }
 
-    public async Task RemoveExistingSoftSkills(Guid profileId)
-    {
-        var existing = _context.SoftSkills.Where(s => s.CandidateProfileId == profileId);
-        _context.SoftSkills.RemoveRange(existing);
-    }
-
-    public async Task RemoveExistingRoles(Guid profileId)
-    {
-        var existing = _context.PreferredRoles.Where(r => r.CandidateProfileId == profileId);
-        _context.PreferredRoles.RemoveRange(existing);
-    }
 
 }
