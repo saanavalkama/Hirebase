@@ -1,4 +1,3 @@
-import type { $ZodStringInternals } from "zod/v4/core"
 
 export interface RegisterRequest{
     email:string,
