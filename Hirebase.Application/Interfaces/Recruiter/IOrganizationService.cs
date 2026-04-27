@@ -8,4 +8,6 @@ public interface IOrganizationService
     Task<List<OrganizationResponseDto>>GetAllByRecruiterId(Guid rid);
 
     Task<OrganizationResponseDto>Update(UpdateOrganizationDto dto, Guid id);
+
+    Task Delete(Guid id);
 }
