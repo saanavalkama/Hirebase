@@ -123,8 +123,8 @@ public class GitHubOAuthService : IGitHubOAuthService
     if (github.LastFetchedAt.HasValue && 
         github.LastFetchedAt.Value.AddDays(2) > DateTime.UtcNow)
     {
-        throw new BadRequestError(
-            $"Next refresh available at {github.LastFetchedAt.Value.AddDays(7):u}");
+        throw new BadRequestException(
+            $"Next refresh available at {github.LastFetchedAt.Value.AddDays(2):u}");
     }
 
     github.FetchStatus = FetchStatus.Pending;

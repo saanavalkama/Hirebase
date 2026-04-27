@@ -43,6 +43,7 @@ public class GitHubFetchBackgroundJob : BackgroundService
     }
 
     private async Task ProcessPendingProfiles(CancellationToken ct)
+    
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

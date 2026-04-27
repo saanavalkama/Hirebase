@@ -10,7 +10,4 @@ public interface ICandidateProfileRepository
     Task<CandidateProfile?>GetProfileByUserId(Guid userId);
 
 
-    Task RemoveExistingSoftSkills(Guid pid);
-
-    Task RemoveExistingRoles(Guid pid);
 }

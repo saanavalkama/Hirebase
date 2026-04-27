@@ -34,7 +34,7 @@ public class ExceptionMiddleware
             ForbiddenException e     => (403, e.Message),
             ConflictException e      => (409, e.Message),
             UnauthorizedException e  => (401, e.Message),
-            BadRequestError e        =>(400, e.Message),
+            BadRequestException e        =>(400, e.Message),
             _                        => (500, "An unexpected error occurred")
         };
 

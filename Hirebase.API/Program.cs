@@ -55,6 +55,7 @@ builder.Services.AddScoped<ITokenEncryptionService, TokenEncryptionService>();
 builder.Services.AddHttpClient<GitHubFetchService>();
 builder.Services.AddScoped<IGitHubFetchService, GitHubFetchService>();
 builder.Services.AddHostedService<GitHubFetchBackgroundJob>();
+builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 

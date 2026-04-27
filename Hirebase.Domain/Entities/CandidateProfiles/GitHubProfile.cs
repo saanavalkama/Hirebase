@@ -1,6 +1,8 @@
 using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 
+namespace Hirebase.Domain.Entities.CandidateProfiles;
+
 public class GitHubProfile
 {
     public Guid Id {get;set;} = Guid.NewGuid();

@@ -41,7 +41,7 @@ public class AuthService : IAuthService
 
         if(!Enum.TryParse<UserRole>(dto.Role, ignoreCase:true, out var role))
         {
-            throw new BadRequestError("Invalid role");
+            throw new BadRequestException("Invalid role");
         }
 
         var user = new User
