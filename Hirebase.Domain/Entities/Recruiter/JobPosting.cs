@@ -26,7 +26,7 @@ public class JobPosting
 
     public JobPostingStatus Status {get;set;}
 
-    public DateTime CretedAt {get;set;} = DateTime.UtcNow;
+    public DateTime CreatedAt {get;set;} = DateTime.UtcNow;
 
     public DateTime UpdatedAt {get;set;} = DateTime.UtcNow;
 

@@ -33,7 +33,10 @@ public class RecruiterProfileRepository : IRecruiterProfileRepository
 
     public async Task<RecruiterProfile?>FindRecruiterByUserId(Guid userId)
     {
-        return await _context.RecruiterProfiles.FirstOrDefaultAsync(r => r.UserId == userId);
+        return await _context
+          .RecruiterProfiles
+          .Include(r => r.Organizations)
+          .FirstOrDefaultAsync(r => r.UserId == userId);
     }
 
     public async Task DeleteRecruiterProfile(Guid userId)
