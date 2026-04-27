@@ -2,6 +2,7 @@ using Hirebase.Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
+using Hirebase.Domain.Entities.Recruiter;
 
 namespace Hirebase.Infrastructure.Data;
 
@@ -19,6 +20,12 @@ public class AppDbContext : DbContext{
     public DbSet<GitHubProfile>GitHubProfiles {get;set;}
 
     public DbSet<GitHubSignals>GitHubSignals {get;set;}
+
+    public DbSet<JobPosting>JobPostings {get;set;}
+
+    public DbSet<Organization>Organizations {get;set;}
+
+    public DbSet<RecruiterProfile>RecruiterProfiles {get;set;}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
 
 
@@ -86,6 +93,40 @@ public class AppDbContext : DbContext{
         {
             g.HasKey(g => g.Id);
             g.HasOne(g => g.GitHubProfile).WithOne(p => p.Signals).HasForeignKey<GitHubSignals>(s => s.GitHubProfileId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RecruiterProfile>(r =>
+        {
+            r.HasKey(r => r.Id);
+            r.HasIndex(r => r.UserId);
+            r
+              .HasOne(r => r.User)
+              .WithOne()
+              .HasForeignKey<RecruiterProfile>(r => r.UserId)
+              .OnDelete(DeleteBehavior.Cascade);
+            r
+              .HasMany(r=>r.Organizations)
+              .WithOne(o => o.RecruiterProfile)
+              .HasForeignKey(o => o.RecruiterProfileId)
+              .OnDelete(DeleteBehavior.Cascade);
+              ;  
+        });
+
+        modelBuilder.Entity<Organization>(o =>
+        {
+            o.HasKey(o => o.Id);
+            o.HasIndex(o => o.RecruiterProfileId);
+            o
+              .HasMany(o => o.JobPostings)
+              .WithOne(p => p.Organization)
+              .HasForeignKey(p => p.OrganizationId)
+              .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<JobPosting>(j =>
+        {
+            j.HasKey(j => j.Id);
+            j.HasIndex(j => j.OrganizationId);
         });
     }
 }
