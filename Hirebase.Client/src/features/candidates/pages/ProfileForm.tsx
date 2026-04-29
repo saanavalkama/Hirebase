@@ -163,8 +163,6 @@ export default function ProfileForm() {
     updateProfile(payload)
   }
 
-  console.log(profile)
-
   return (
     <div className="min-h-screen flex flex-col bg-[#18181f] text-stone-200">
       <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#18181f]/80 backdrop-blur-md">

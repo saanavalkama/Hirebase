@@ -9,5 +9,5 @@ public record CreateJobPostingDto(
     string? Location,
     string? RemotePreference,
     DateOnly? LastApplicationDay,
-    string JobPostingStatus
+    string Status
 );

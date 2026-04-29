@@ -41,7 +41,7 @@ public class JobPostingService : IJobPostingService
                 ? Enum.Parse<RemotePreference>(dto.RemotePreference)
                 : null,
             LastApplicationDay = dto.LastApplicationDay,
-            Status = Enum.Parse<JobPostingStatus>(dto.JobPostingStatus)
+            Status = Enum.Parse<JobPostingStatus>(dto.Status)
         };
 
         var saved = await _repo.Create(posting);
