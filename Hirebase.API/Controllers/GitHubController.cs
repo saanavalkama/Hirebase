@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Hirebase.Application.Interfaces;
+using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,19 +12,23 @@ namespace Hirebase.API.Controllers;
 public class GitHubController : ControllerBase
 {
     private readonly IConfiguration _config;
-    private readonly IGitHubOAuthService  _githubService;
-
+    private readonly IGitHubOAuthService _githubService;
     private readonly IMemoryCache _cache;
+    private readonly ICandidateProfileRepository _candidateRepo;
+    private readonly IGitHubProfileRepository _githubProfileRepo;
 
     public GitHubController(
-        IConfiguration config, 
+        IConfiguration config,
         IGitHubOAuthService githubService,
-        IMemoryCache cache
-        )
+        IMemoryCache cache,
+        ICandidateProfileRepository candidateRepo,
+        IGitHubProfileRepository githubProfileRepo)
     {
         _config = config;
         _githubService = githubService;
         _cache = cache;
+        _candidateRepo = candidateRepo;
+        _githubProfileRepo = githubProfileRepo;
     } 
 // On connect - store a random state tied to userId
 [HttpGet("connect")]
@@ -63,6 +68,32 @@ if(string.IsNullOrEmpty(state)) throw new BadRequestException("No state provided
 
     await _githubService.HandleCallback(code, Guid.Parse(userId!));
     return Redirect(frontendUri);
+}
+
+[HttpPost("refreshData")]
+[Authorize]
+public async Task<IActionResult> RefreshData()
+{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+        ?? throw new UnauthorizedException("User not found");
+
+    var profile = await _candidateRepo.GetProfileByUserId(Guid.Parse(userId))
+        ?? throw new NotFoundException("Candidate profile");
+
+    var githubProfile = await _githubProfileRepo.GetByProfileId(profile.Id)
+        ?? throw new NotFoundException("GitHub profile");
+
+    if (githubProfile.LastFetchedAt.HasValue &&
+        githubProfile.LastFetchedAt.Value > DateTime.UtcNow.AddHours(-48))
+    {
+        var availableAt = githubProfile.LastFetchedAt.Value.AddHours(48);
+        throw new BadRequestException($"Refresh available after {availableAt:yyyy-MM-ddTHH:mm:ssZ}");
+    }
+
+    githubProfile.FetchStatus = FetchStatus.Pending;
+    await _githubProfileRepo.Update(githubProfile);
+
+    return Ok(new { message = "Refresh queued" });
 }
 
 }

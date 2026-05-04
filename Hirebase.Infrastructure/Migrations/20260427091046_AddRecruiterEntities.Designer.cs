@@ -3,6 +3,7 @@ using System;
 using Hirebase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hirebase.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260427091046_AddRecruiterEntities")]
+    partial class AddRecruiterEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,14 +290,11 @@ namespace Hirebase.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CretedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("JobPostingSoftSkills")
                         .HasColumnType("text");
 
                     b.Property<DateOnly?>("LastApplicationDay")
@@ -306,14 +306,8 @@ namespace Hirebase.Infrastructure.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("PreferredRole")
-                        .HasColumnType("text");
-
                     b.Property<int?>("RemotePreference")
                         .HasColumnType("integer");
-
-                    b.Property<string>("RequiredLanguages")
-                        .HasColumnType("text");
 
                     b.Property<int?>("SalaryMax")
                         .HasColumnType("integer");
