@@ -1,4 +1,4 @@
-import type { CreateRecruiterProfileRequest, UpdateCandidateProfileRequest, UpdateRecruiterProfileRequest } from "@/types/types"
+import type { CreateRecruiterProfileRequest, UpdateRecruiterProfileRequest } from "@/types/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { recuiterServices } from "../services/recruiterServices"
 import { useMe } from "@/features/auth/hooks/useAuthQueries"

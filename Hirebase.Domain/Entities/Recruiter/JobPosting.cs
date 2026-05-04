@@ -32,5 +32,10 @@ public class JobPosting
 
     public DateOnly? LastApplicationDay {get;set;}
 
+    public string? RequiredLanguages {get;set;}
+
+    public string? PreferredRole {get;set;}
+
+    public string? JobPostingSoftSkills {get;set;}
 
 }

@@ -1,4 +1,3 @@
-
 export interface RegisterRequest{
     email:string,
     password: string,
@@ -169,11 +168,14 @@ export interface JobPostingResponse{
     lastApplicationDay?:string,
     createdAt:string,
     updatedAt:string
+    requiredLanguages:string[],
+    preferredRole:string,
+    jobPostingSoftSkills:string[]
 }
 
 
-export type JobPostingStatus = 
-  | "Darft"
+export type JobPostingStatus =
+  | "Draft"
   | "Open"
   | "Closed"
 
@@ -185,9 +187,12 @@ export interface CreateJobPostingRequest{
     salaryMin?:number,
     salaryMax?:number,
     location?:string,
-    remotePrefrence?: RemotePreference,
-    status:JobPostingStatus,
+    remotePreference?: RemotePreference,
+    status: "Draft" | "Open" | "Closed",
     lastApplicationDay?:string,
+    requiredLanguages?: string[],
+    preferredRole?: string,
+    jobPostingSoftSkills?: string[],
 }
 
 export interface UpdateJobPostingRequest{
@@ -198,7 +203,10 @@ export interface UpdateJobPostingRequest{
     salaryMin?:number,
     salaryMax?:number,
     location?:string,
-    remotePrefrence?: RemotePreference,
-    status:JobPostingStatus,
+    remotePreference?: RemotePreference,
+    status: "Draft" | "Open" | "Closed",
     lastApplicationDay?:string,
+    requiredLanguages?: string[],
+    preferredRole?: string,
+    jobPostingSoftSkills?: string[],
 }

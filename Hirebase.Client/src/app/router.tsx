@@ -9,8 +9,9 @@ import { Navigate } from 'react-router-dom';
 import RecruiterProtectedRoute from '@/features/auth/components/RecruiterProtectedRoute';
 import RecruiterDashboard from '@/features/recruiter/pages/Dashboard';
 import Profile from '@/features/recruiter/pages/Profile';
-import OrganizationForm from '@/features/recruiter/components/OrganizationForm';
 import OrganizationPage from '@/features/recruiter/pages/OrganizationPage';
+import JobPosting from '@/features/recruiter/pages/JobPosting'
+import JobPostingsList from '@/features/recruiter/pages/JobPostingsList';
 
 
 export const router = createBrowserRouter([
@@ -42,7 +43,9 @@ export const router = createBrowserRouter([
             {index: true, element: <Navigate to="dashboard" />},
             {path:"dashboard", element: <RecruiterDashboard/>},
             {path:"profile/edit", element:<Profile />},
-            {path:"organizations",element:<OrganizationPage /> }
+            {path:"organizations",element:<OrganizationPage /> },
+            {path:"jobPosting", element:<JobPosting />},
+            {path:"jobPostings", element:<JobPostingsList />}
         ]
         
     }

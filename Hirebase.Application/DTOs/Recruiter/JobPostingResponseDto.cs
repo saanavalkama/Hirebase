@@ -14,5 +14,8 @@ public record JobPostingResponseDto(
     string Status,
     DateOnly? LastApplicationDay,
     DateTime CreatedAt,
-    DateTime UpdatedAt
+    DateTime UpdatedAt,
+    List<string> RequiredLanguages,
+    string? PreferredRole,
+    List<string> JobPostingSoftSkills
 );

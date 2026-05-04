@@ -1,4 +1,6 @@
 // JobPostingService.cs
+using System.Runtime.CompilerServices;
+using System.Text.Json;
 using Hirebase.Application.DTOs.Recruiter;
 using Hirebase.Application.Interfaces.Recruiter;
 using Hirebase.Domain.Entities.Recruiter;
@@ -41,7 +43,10 @@ public class JobPostingService : IJobPostingService
                 ? Enum.Parse<RemotePreference>(dto.RemotePreference)
                 : null,
             LastApplicationDay = dto.LastApplicationDay,
-            Status = Enum.Parse<JobPostingStatus>(dto.Status)
+            Status = Enum.Parse<JobPostingStatus>(dto.Status),
+            RequiredLanguages = JsonSerializer.Serialize(dto.RequiredLanguages),
+            PreferredRole = dto.PreferredRole,
+            JobPostingSoftSkills = JsonSerializer.Serialize(dto.JobPostingSoftSkills)
         };
 
         var saved = await _repo.Create(posting);
@@ -65,6 +70,9 @@ public class JobPostingService : IJobPostingService
         if(dto.SalaryMax != null) posting.SalaryMax = dto.SalaryMax;
         if(dto.Location != null) posting.Location = dto.Location;
         if(dto.LastApplicationDay != null) posting.LastApplicationDay = dto.LastApplicationDay;
+        if(dto.RequiredLanguages != null) posting.RequiredLanguages = JsonSerializer.Serialize(dto.RequiredLanguages);
+        if(dto.PreferredRole != null) posting.PreferredRole = dto.PreferredRole;
+        if(dto.JobPostingSoftSkills != null) posting.JobPostingSoftSkills = JsonSerializer.Serialize(dto.JobPostingSoftSkills);
         posting.UpdatedAt = DateTime.UtcNow;
 
         var updated = await _repo.Update(posting);
@@ -109,6 +117,9 @@ public class JobPostingService : IJobPostingService
         posting.Status.ToString(),
         posting.LastApplicationDay,
         posting.CreatedAt,
-        posting.UpdatedAt
+        posting.UpdatedAt,
+        JsonSerializer.Deserialize<List<string>>(posting.RequiredLanguages ?? "[]") ?? new List<string>(),
+        posting.PreferredRole,
+        JsonSerializer.Deserialize<List<string>>(posting.JobPostingSoftSkills ?? "[]") ?? new List<string>()
     );
 }

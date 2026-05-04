@@ -8,5 +8,9 @@ public record UpdateJobPostingDto(
     string? Location,
     string? RemotePreference,
     string? Status,
-    DateOnly? LastApplicationDay
+    DateOnly? LastApplicationDay,
+    List<string>? RequiredLanguages,
+    string? PreferredRole,
+    List<string>JobPostingSoftSkills 
+
 );

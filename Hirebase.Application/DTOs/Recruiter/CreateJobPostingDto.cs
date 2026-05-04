@@ -9,5 +9,8 @@ public record CreateJobPostingDto(
     string? Location,
     string? RemotePreference,
     DateOnly? LastApplicationDay,
-    string Status
+    string Status,
+    List<string>RequiredLanguages,
+    string? PreferredRole,
+    List<string> JobPostingSoftSkills
 );
