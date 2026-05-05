@@ -10,7 +10,7 @@ public record CreateJobPostingDto(
     string? RemotePreference,
     DateOnly? LastApplicationDay,
     string Status,
-    List<string>RequiredLanguages,
+    List<string>?RequiredLanguages,
     string? PreferredRole,
-    List<string> JobPostingSoftSkills
+    List<string>? JobPostingSoftSkills
 );
