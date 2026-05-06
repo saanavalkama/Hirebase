@@ -3,6 +3,7 @@ using System;
 using Hirebase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hirebase.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505110755_AddCandidateApplications")]
+    partial class AddCandidateApplications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,36 +24,6 @@ namespace Hirebase.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Hirebase.Domain.Entities.Application.CandidateApplication", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("AppledAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("ApplicationStage")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("CandidateProfileId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("JobPostingId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CandidateProfileId");
-
-                    b.HasIndex("JobPostingId");
-
-                    b.ToTable("CandidateApplications");
-                });
 
             modelBuilder.Entity("Hirebase.Domain.Entities.Auth.RefreshToken", b =>
                 {
@@ -430,25 +403,6 @@ namespace Hirebase.Infrastructure.Migrations
                     b.ToTable("RecruiterProfiles");
                 });
 
-            modelBuilder.Entity("Hirebase.Domain.Entities.Application.CandidateApplication", b =>
-                {
-                    b.HasOne("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", "CandidateProfile")
-                        .WithMany("Applications")
-                        .HasForeignKey("CandidateProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Hirebase.Domain.Entities.Recruiter.JobPosting", "JobPosting")
-                        .WithMany("Applications")
-                        .HasForeignKey("JobPostingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CandidateProfile");
-
-                    b.Navigation("JobPosting");
-                });
-
             modelBuilder.Entity("Hirebase.Domain.Entities.Auth.RefreshToken", b =>
                 {
                     b.HasOne("Hirebase.Domain.Entities.Auth.User", "User")
@@ -555,8 +509,6 @@ namespace Hirebase.Infrastructure.Migrations
 
             modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", b =>
                 {
-                    b.Navigation("Applications");
-
                     b.Navigation("GitHubProfile");
 
                     b.Navigation("PreferredRoles");
@@ -567,11 +519,6 @@ namespace Hirebase.Infrastructure.Migrations
             modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.GitHubProfile", b =>
                 {
                     b.Navigation("Signals");
-                });
-
-            modelBuilder.Entity("Hirebase.Domain.Entities.Recruiter.JobPosting", b =>
-                {
-                    b.Navigation("Applications");
                 });
 
             modelBuilder.Entity("Hirebase.Domain.Entities.Recruiter.Organization", b =>

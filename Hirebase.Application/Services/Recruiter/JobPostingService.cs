@@ -1,6 +1,7 @@
 // JobPostingService.cs
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Hirebase.Application.DTOs.Common;
 using Hirebase.Application.DTOs.Recruiter;
 using Hirebase.Application.Interfaces.Recruiter;
 using Hirebase.Domain.Entities.Recruiter;
@@ -101,6 +102,24 @@ public class JobPostingService : IJobPostingService
     {
         var postings = await _repo.GetByRecruiterProfileId(recruiterProfileId);
         return postings.Select(MapToDto).ToList();
+    }
+
+   public async Task<PaginatedResponse<JobPostingResponseDto>>GetFeed(int page, int pageSize)
+    {
+        if(pageSize > 50 ) pageSize = 50;
+
+        var total = await _repo.CountActive();
+        var postings = await _repo.GetActivePaginated(page, pageSize);
+
+        return new PaginatedResponse<JobPostingResponseDto>(
+            Items: postings.Select(MapToDto).ToList(),
+            Page: page,
+            PageSize:pageSize,
+            TotalCount: total,
+            TotalPages: (int)Math.Ceiling(total / (double)(pageSize)),
+            HasNextPage: page*pageSize < total,
+            HasPreviousPage: page > 1
+        );
     }
 
     private JobPostingResponseDto MapToDto(JobPosting posting) => new(

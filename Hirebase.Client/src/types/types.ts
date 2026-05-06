@@ -210,3 +210,19 @@ export interface UpdateJobPostingRequest{
     preferredRole?: string,
     jobPostingSoftSkills?: string[],
 }
+
+export interface JobFeedResponse{
+    items: JobPostingResponse[],
+    page: number,
+    pageSize: number,
+    totalCount: number,
+    totalPages: number,
+    hasNextPage: boolean,
+    hasPreviousPage: boolean
+}
+
+export interface JobFeedRequest{
+    page: number,
+    pageSize: number
+}
+

@@ -1,3 +1,4 @@
+using Hirebase.Domain.Entities.Application;
 using Hirebase.Domain.Entities.Auth;
 using Hirebase.Domain.Enums;
 
@@ -33,6 +34,8 @@ public class CandidateProfile
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public GitHubProfile? GitHubProfile {get;set;}
+
+    public ICollection<CandidateApplication> Applications{get;set;} = [];
 }
 
 

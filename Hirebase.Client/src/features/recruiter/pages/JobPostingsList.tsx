@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { useDeleteJobPosting, useRecruitersPostings } from "../hooks/jobPostingHooks"
+import { useDeleteJobPosting, useRecruitersPostings } from "../../jobPosting/hooks/jobPostingHooks"
 import type { JobPostingResponse, JobPostingStatus } from "@/types/types"
 import {
   Dialog,

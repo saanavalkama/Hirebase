@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { jobPostingServices } from "../services/jobPostingServices"
 import { useMe } from "@/features/auth/hooks/useAuthQueries"
-import type { CreateJobPostingRequest, UpdateJobPostingRequest } from "@/types/types"
+import type { CreateJobPostingRequest, JobFeedRequest, UpdateJobPostingRequest } from "@/types/types"
 import { toast } from "sonner"
 import { getErrorMessage } from "@/utils/getErrorMessage"
 
@@ -62,5 +62,13 @@ export const useDeleteJobPosting = () => {
             toast.success("Job posting deleted")
         },
         onError: (err) => toast.error(getErrorMessage(err, "Failed to delete job posting"))
+    })
+}
+
+export const useGetFeed = (data:JobFeedRequest) =>{
+    return useQuery({
+      queryKey:["jobFeed", data.page,data.pageSize],
+      queryFn:()=>jobPostingServices.getFeed(data),
+      staleTime: 60 * 1000 * 2
     })
 }

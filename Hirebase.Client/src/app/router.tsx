@@ -12,6 +12,8 @@ import Profile from '@/features/recruiter/pages/Profile';
 import OrganizationPage from '@/features/recruiter/pages/OrganizationPage';
 import JobPosting from '@/features/recruiter/pages/JobPosting'
 import JobPostingsList from '@/features/recruiter/pages/JobPostingsList';
+import JobFeed from '@/features/candidates/pages/JobFeed';
+import JobPostingDetail from '@/features/candidates/pages/JobPostingDetail';
 
 
 export const router = createBrowserRouter([
@@ -33,7 +35,9 @@ export const router = createBrowserRouter([
         children:[
             {index: true, element: <Navigate to="dashboard" />},
             {path:"dashboard", element: <CandidateDashboard />},
-            {path:"profile", element:<ProfileForm />}
+            {path:"profile", element:<ProfileForm />},
+            {path:"feed", element: <JobFeed />},
+            {path:"feed/:id", element: <JobPostingDetail />}
         ]
     },
     {

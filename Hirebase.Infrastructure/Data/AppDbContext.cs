@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 using Hirebase.Domain.Entities.Recruiter;
+using Hirebase.Domain.Entities.Application;
 
 namespace Hirebase.Infrastructure.Data;
 
@@ -26,6 +27,9 @@ public class AppDbContext : DbContext{
     public DbSet<Organization>Organizations {get;set;}
 
     public DbSet<RecruiterProfile>RecruiterProfiles {get;set;}
+
+    public DbSet<CandidateApplication>CandidateApplications {get;set;}
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
 
 
@@ -127,6 +131,21 @@ public class AppDbContext : DbContext{
         {
             j.HasKey(j => j.Id);
             j.HasIndex(j => j.OrganizationId);
+        });
+
+        modelBuilder.Entity<CandidateApplication>(a =>
+        {
+            a.HasKey(a => a.Id);
+            a.
+            HasOne(a => a.CandidateProfile)
+            .WithMany(p => p.Applications)
+            .HasForeignKey(a => a.CandidateProfileId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            a.HasOne(a => a.JobPosting)
+            .WithMany(j => j.Applications)
+            .HasForeignKey(a => a.JobPostingId)
+            .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
