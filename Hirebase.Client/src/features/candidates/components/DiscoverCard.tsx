@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 
 export default function DiscoverCard() {
@@ -12,12 +13,14 @@ export default function DiscoverCard() {
                 <Button className="w-full bg-teal-600 hover:bg-teal-500 text-white rounded-full py-4 text-sm font-medium shadow-lg shadow-teal-500/20 transition-all">
                     CTE Match
                 </Button>
-                <Button
-                    variant="ghost"
-                    className="w-full border border-white/[0.08] text-stone-300 hover:text-white hover:bg-white/[0.06] rounded-full py-4 text-sm font-medium"
-                >
-                    Browse Jobs
-                </Button>
+                <Link to="/app/candidate/feed">
+                    <Button
+                        variant="ghost"
+                        className="w-full border border-white/[0.08] text-stone-300 hover:text-white hover:bg-white/[0.06] rounded-full py-4 text-sm font-medium"
+                    >
+                        Browse Jobs
+                    </Button>
+                </Link>
             </div>
         </div>
     )

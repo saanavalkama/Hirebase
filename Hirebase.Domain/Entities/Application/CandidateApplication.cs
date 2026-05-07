@@ -15,6 +15,6 @@ public class CandidateApplication
 
     public JobPosting JobPosting {get;set;} = null!;
     public ApplicationStage ApplicationStage {get;set;} = ApplicationStage.Applied;
-    public DateTime AppledAt {get;set;} = DateTime.UtcNow;
+    public DateTime AppliedAt {get;set;} = DateTime.UtcNow;
     public DateTime UpdatedAt {get;set;} = DateTime.UtcNow;
 }

@@ -4,6 +4,7 @@ using Hirebase.API.Settings;
 using Hirebase.API.Middleware;
 using Hirebase.Application.Interfaces;
 using Hirebase.Application.Interfaces.Recruiter;
+using Hirebase.Application.Interfaces.Application;
 using Hirebase.Infrastructure.Services;
 using Hirebase.Infrastructure.Repositories;
 using Hirebase.Infrastructure.Repositories.Recruiter;
@@ -67,6 +68,8 @@ builder.Services.AddHostedService<GitHubFetchBackgroundJob>();
 builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 
 builder.Services.AddCors(options =>
 {
@@ -103,6 +106,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseRouting();
 app.UseCors("AllowClient");
 app.UseAuthentication();
 app.UseAuthorization();

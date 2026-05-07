@@ -1,12 +1,17 @@
 import { useGetFeed } from "@/features/jobPosting/hooks/jobPostingHooks"
+import { useGetAllJobIds } from "@/features/application/hooks/useApplicationHooks"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import type { JobPostingResponse } from "@/types/types"
 
-function JobCard({ job }: { job: JobPostingResponse }) {
+function JobCard({ job, applied }: { job: JobPostingResponse; applied: boolean }) {
     return (
         <Link to={`/app/candidate/feed/${job.id}`} className="block h-full">
-            <div className="bg-[#1e1e28] border border-stone-800 rounded-xl p-5 h-full flex flex-col gap-3 hover:border-teal-500/40 hover:bg-[#21212d] transition-colors">
+            <div className={`rounded-xl p-5 h-full flex flex-col gap-3 transition-colors ${
+                applied
+                    ? "bg-emerald-950/40 border border-emerald-700/50 hover:border-emerald-500/70 hover:bg-emerald-950/60"
+                    : "bg-[#1e1e28] border border-stone-700/60 hover:border-stone-600 hover:bg-[#21212d]"
+            }`}>
                 <div>
                     <h3 className="text-white font-semibold text-sm leading-snug">{job.title}</h3>
                     <p className="text-teal-400 text-xs mt-1">{job.organizationName}</p>
@@ -61,6 +66,10 @@ function JobCard({ job }: { job: JobPostingResponse }) {
 export default function JobFeed() {
     const [page, setPage] = useState(1)
     const { data: feed, isPending, isError } = useGetFeed({ page, pageSize: 12 })
+    const { data: appliedIds } = useGetAllJobIds()
+
+    console.log(appliedIds)
+    console.log(feed?.items)
 
     if (isPending) return (
         <div className="min-h-screen bg-[#18181f] flex items-center justify-center">
@@ -77,6 +86,10 @@ export default function JobFeed() {
     return (
         <div className="min-h-screen bg-[#18181f] text-stone-200">
             <main className="max-w-7xl mx-auto px-6 py-10">
+                <Link to="/app/candidate/dashboard" className="text-sm text-stone-500 hover:text-teal-400 transition-colors inline-block mb-6">
+                    ← Back to dashboard
+                </Link>
+
                 <div className="mb-8">
                     <h1 className="text-2xl font-semibold text-white">Job Feed</h1>
                     <p className="mt-1 text-sm text-stone-500">{feed?.totalCount} open positions</p>
@@ -84,7 +97,7 @@ export default function JobFeed() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {feed?.items.map(job => (
-                        <JobCard key={job.id} job={job} />
+                        <JobCard key={job.id} job={job} applied={appliedIds?.includes(job.id) ?? false} />
                     ))}
                 </div>
 

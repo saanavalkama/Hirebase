@@ -14,6 +14,7 @@ import JobPosting from '@/features/recruiter/pages/JobPosting'
 import JobPostingsList from '@/features/recruiter/pages/JobPostingsList';
 import JobFeed from '@/features/candidates/pages/JobFeed';
 import JobPostingDetail from '@/features/candidates/pages/JobPostingDetail';
+import Applications from '@/features/candidates/pages/Applications';
 
 
 export const router = createBrowserRouter([
@@ -37,7 +38,8 @@ export const router = createBrowserRouter([
             {path:"dashboard", element: <CandidateDashboard />},
             {path:"profile", element:<ProfileForm />},
             {path:"feed", element: <JobFeed />},
-            {path:"feed/:id", element: <JobPostingDetail />}
+            {path:"feed/:id", element: <JobPostingDetail />},
+            {path:"applications", element:<Applications />}
         ]
     },
     {
@@ -50,6 +52,7 @@ export const router = createBrowserRouter([
             {path:"organizations",element:<OrganizationPage /> },
             {path:"jobPosting", element:<JobPosting />},
             {path:"jobPostings", element:<JobPostingsList />}
+
         ]
         
     }

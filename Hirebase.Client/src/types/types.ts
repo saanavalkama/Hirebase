@@ -226,3 +226,22 @@ export interface JobFeedRequest{
     pageSize: number
 }
 
+export interface ApplyRequest{
+    jobPostingId: string
+}
+
+export interface ApplyResponse{
+    id: string,
+    jobPostingId: string,
+    jobTitle: string,
+    organizationName: string,
+    roleType: string | null,
+    seniorityLevel: string | null,
+    remotePreference: string | null,
+    candidateProfileId: string,
+    candidateName: string | null,
+    stage: string,
+    appliedAt: string,
+    updatedAt: string,
+}
+

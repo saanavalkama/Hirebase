@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom"
 import { useJobPostingById } from "@/features/jobPosting/hooks/jobPostingHooks"
+import { useApply, useGetAllJobIds } from "@/features/application/hooks/useApplicationHooks";
 
 function Badge({ label }: { label: string }) {
     return (
@@ -20,7 +21,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function JobPostingDetail() {
     const { id } = useParams<{ id: string }>()
-    const { data: job, isPending } = useJobPostingById(id ?? "")
+    const { data: job, isPending, isError } = useJobPostingById(id ?? "")
+    const {mutate: apply, isPending:isApplyPending, isError:isApplyError} = useApply()
+    const { data: appliedIds } = useGetAllJobIds()
+    const hasApplied = appliedIds?.includes(id ?? "") ?? false
 
     if (isPending) return (
         <div className="min-h-screen bg-[#18181f] flex items-center justify-center">
@@ -28,11 +32,15 @@ export default function JobPostingDetail() {
         </div>
     )
 
-    if (!job) return (
+    if (!job || !id) return (
         <div className="min-h-screen bg-[#18181f] flex items-center justify-center">
             <p className="text-stone-500">Job not found.</p>
         </div>
     )
+
+    const handleApply = () => {
+        apply({jobPostingId:id})
+    }
 
     const salary = job.salaryMin && job.salaryMax
         ? `€${job.salaryMin.toLocaleString()} – €${job.salaryMax.toLocaleString()}`
@@ -49,6 +57,10 @@ export default function JobPostingDetail() {
                 <Link to="/app/candidate/feed" className="text-sm text-stone-500 hover:text-teal-400 transition-colors w-fit">
                     ← Back to feed
                 </Link>
+                {(isApplyError || isError) && 
+                <div>
+                    Something unexpected happend
+                </div>}
 
                 {/* Header */}
                 <div className="border-b border-stone-800 pb-6">
@@ -107,10 +119,11 @@ export default function JobPostingDetail() {
 
                 {/* Apply button */}
                 <button
-                    onClick={() => {}}
-                    className="w-full py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-[#18181f] font-semibold text-sm transition-colors"
+                    onClick={handleApply}
+                    disabled={isApplyPending || hasApplied}
+                    className="w-full py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-[#18181f] font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Apply
+                    {isApplyPending ? 'Applying...' : hasApplied ? 'Already applied' : 'Apply'}
                 </button>
 
             </main>
