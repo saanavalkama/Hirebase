@@ -68,8 +68,6 @@ export default function JobFeed() {
     const { data: feed, isPending, isError } = useGetFeed({ page, pageSize: 12 })
     const { data: appliedIds } = useGetAllJobIds()
 
-    console.log(appliedIds)
-    console.log(feed?.items)
 
     if (isPending) return (
         <div className="min-h-screen bg-[#18181f] flex items-center justify-center">

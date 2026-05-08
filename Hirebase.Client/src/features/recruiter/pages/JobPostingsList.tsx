@@ -128,6 +128,16 @@ export default function JobPostingsList() {
                                             size="sm"
                                             className="border-white/[0.1] text-stone-300 hover:bg-white/[0.06] hover:text-white"
                                         >
+                                            <Link to={`/app/recruiter/${posting.id}/pipeline`}>
+                                                Pipeline
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className="border-white/[0.1] text-stone-300 hover:bg-white/[0.06] hover:text-white"
+                                        >
                                             <Link to={`/app/recruiter/jobPosting?jobPostingId=${posting.id}`}>
                                                 Edit
                                             </Link>

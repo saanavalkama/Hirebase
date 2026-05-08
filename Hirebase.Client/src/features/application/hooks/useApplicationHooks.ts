@@ -1,4 +1,4 @@
-import type { ApplyRequest } from "@/types/types"
+import type { InboxRequest, JobPostingRequest } from "@/types/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { applicationServices } from "../services/applicationServices"
 import { toast } from "sonner"
@@ -10,7 +10,7 @@ export const useApply = () => {
     const queryClient = useQueryClient()
     const {data:me} = useMe()
     return useMutation({
-        mutationFn:(data:ApplyRequest) => applicationServices.apply(data),
+        mutationFn:(data:JobPostingRequest) => applicationServices.apply(data),
         onSuccess:(data) => {
             toast.success(`Congratulations ${data.candidateName}! You succesfully
                 applied to ${data.jobTitle} at ${data.organizationName
@@ -45,6 +45,26 @@ export const getMyApplications = () => {
         queryKey:['applications',me?.userId],
         queryFn:()=>applicationServices.getMyApplications(),
         enabled: !!me,
+        staleTime: 1000 * 60 * 5
+    })
+}
+
+export const useInbox = (data:InboxRequest) => {
+    const {data: me} = useMe()
+    return useQuery({
+        queryKey:['inbox', me?.userId, data.jobPostingId, data.page, data.pageSize],
+        queryFn:() => applicationServices.getInbox(data),
+        enabled:!!me || !data,
+        staleTime:1000*60*5
+    })
+}
+
+export const usePipeline = (data:JobPostingRequest) => {
+    const {data:me} = useMe()
+    return useQuery({
+        queryKey:['pipeline',me?.userId],
+        queryFn:()=>applicationServices.getPipeline(data),
+        enabled:!!me || !!data,
         staleTime: 1000 * 60 * 5
     })
 }
