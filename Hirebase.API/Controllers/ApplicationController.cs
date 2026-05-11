@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Hirebase.Application.Interfaces.Application;
 using System.Security.Claims;
 using Hirebase.Domain.Exceptions;
+using Hirebase.Application.DTOs.Application;
 
 namespace Hirebase.API.Controllers;
 
@@ -55,6 +56,37 @@ public class ApplicationController : ControllerBase
         var ids = await _applicationService.GetAllCandidateApplicationIds(GetAndParseUserID());
 
         return Ok(ids);
+    }
+
+    [HttpGet("recruiter/{jobPostingId}/applied")]
+    public async Task<IActionResult> GetAllApplied(Guid jobPostingId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var paginatedApplications = await _applicationService.GetAllAppliedByJobPostingIdPaginated(jobPostingId, GetAndParseUserID(), page, pageSize);
+        return Ok(paginatedApplications);
+    }
+
+    [HttpGet("recruiter/{jobPostingId}/pipeline")]
+    public async Task<IActionResult> GetPipeline(Guid jobPostingId)
+    {
+        var pipeline = await _applicationService.GetPipeline(jobPostingId, GetAndParseUserID());
+        return Ok(pipeline);
+    }
+
+    [HttpPatch("{applicationId}/stage")]
+    public async Task<IActionResult>UpdateApplication(Guid applicationId, [FromBody] UpdateStageDto dto)
+    {
+       var application = await _applicationService.UpdateApplication(applicationId, GetAndParseUserID(),dto) ;
+       return Ok(application);
+    }
+
+    [HttpDelete("{jobPostingId:guid}")]
+    public async Task<IActionResult>Withdrawn(Guid jobPostingId)
+    {
+        var result = await _applicationService.Withdraw(jobPostingId, GetAndParseUserID());
+
+        if(result) return NoContent();
+    
+        return NotFound();
     }
 
 }

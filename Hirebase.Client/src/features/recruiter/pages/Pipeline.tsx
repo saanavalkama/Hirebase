@@ -1,9 +1,9 @@
 import { useState, useEffect, type Dispatch, type SetStateAction } from "react"
 import { useParams, Link } from "react-router-dom"
 import { formatDistanceToNow } from "date-fns"
-import { Zap, Star, GitPullRequest, PackageOpen } from "lucide-react"
-import { useInbox, usePipeline } from "@/features/application/hooks/useApplicationHooks"
-import type { InboxFeedResponse, RecruiterApplicationResponse } from "@/types/types"
+import { Zap, Star, GitPullRequest, PackageOpen, ArrowRight, X } from "lucide-react"
+import { useInbox, usePipeline, useUpdateApplicationStage } from "@/features/application/hooks/useApplicationHooks"
+import type { ApplicationSatge, InboxFeedResponse, RecruiterApplicationResponse } from "@/types/types"
 import {
     DndContext,
     type DragEndEvent,
@@ -29,6 +29,7 @@ export default function Pipeline() {
         pageSize: 20,
     })
     const { data: pipeline, isPending, isError } = usePipeline({ jobPostingId: jobPostingId ?? "" })
+    const { mutate: updateStage } = useUpdateApplicationStage({ jobPostingId: jobPostingId ?? "" })
 
     const [items, setItems] = useState<RecruiterApplicationResponse[]>([])
     const [activeApp, setActiveApp] = useState<RecruiterApplicationResponse | null>(null)
@@ -51,8 +52,7 @@ export default function Pipeline() {
         if (items.find(a => a.id === active.id)?.stage === newStage) return
 
         setItems(prev => prev.map(a => a.id === active.id ? { ...a, stage: newStage } : a))
-        // TODO: PATCH /applications/{active.id}/stage { stage: newStage }
-        console.log(`PATCH /applications/${active.id}/stage →`, newStage)
+        updateStage({ applicationId: active.id as string, stage: newStage as ApplicationSatge })
     }
 
     if (!jobPostingId) return (
@@ -98,7 +98,13 @@ export default function Pipeline() {
                                 </div>
                             )}
                             {inbox?.items.map(app => (
-                                <CandidateCard key={app.id} application={app} noDrag />
+                                <CandidateCard
+                                    key={app.id}
+                                    application={app}
+                                    noDrag
+                                    onMoveToScreening={(id) => updateStage({ applicationId: id, stage: "Screening" })}
+                                    onReject={(id) => updateStage({ applicationId: id, stage: "Rejected" })}
+                                />
                             ))}
                             {inbox && inbox.totalPages > 1 && (
                                 <PaginationControls inbox={inbox} setPage={setInboxPage} />
@@ -116,6 +122,7 @@ export default function Pipeline() {
                                     apps={items.filter(a => a.stage === stage)}
                                     isPending={isPending}
                                     isError={isError}
+                                    onReject={(id) => updateStage({ applicationId: id, stage: "Rejected" })}
                                 />
                             ))}
                         </div>
@@ -134,11 +141,13 @@ function KanbanColumn({
     apps,
     isPending,
     isError,
+    onReject,
 }: {
     stage: PipelineStage
     apps: RecruiterApplicationResponse[]
     isPending: boolean
     isError: boolean
+    onReject: (id: string) => void
 }) {
     const { setNodeRef, isOver } = useDroppable({ id: stage })
 
@@ -153,7 +162,7 @@ function KanbanColumn({
 
             <div
                 ref={setNodeRef}
-                className={`flex flex-col gap-2 min-h-32 rounded-xl p-1 transition-colors ${
+                className={`flex flex-col gap-2 min-h-[600px] rounded-xl p-1 transition-colors ${
                     isOver ? "bg-teal-500/[0.05] ring-1 ring-teal-500/20" : ""
                 }`}
             >
@@ -164,12 +173,12 @@ function KanbanColumn({
                     <div className="text-xs text-red-400 text-center py-6">Failed to load.</div>
                 )}
                 {!isPending && !isError && apps.length === 0 && (
-                    <div className="rounded-xl border border-dashed border-white/[0.07] h-32 flex items-center justify-center text-xs text-stone-700">
+                    <div className="rounded-xl border border-dashed border-white/[0.07] flex-1 flex items-center justify-center text-xs text-stone-700">
                         Drop here
                     </div>
                 )}
                 {apps.map(app => (
-                    <CandidateCard key={app.id} application={app} />
+                    <CandidateCard key={app.id} application={app} onReject={onReject} />
                 ))}
             </div>
         </div>
@@ -180,10 +189,14 @@ function CandidateCard({
     application,
     isOverlay = false,
     noDrag = false,
+    onMoveToScreening,
+    onReject,
 }: {
     application: RecruiterApplicationResponse
     isOverlay?: boolean
     noDrag?: boolean
+    onMoveToScreening?: (id: string) => void
+    onReject?: (id: string) => void
 }) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: application.id,
@@ -203,38 +216,63 @@ function CandidateCard({
             {...(isOverlay ? {} : { ...attributes, ...listeners })}
             className={`touch-none transition-opacity ${isDragging && !isOverlay ? "opacity-40" : "opacity-100"}`}
         >
-            <Link
-                to={`${application.candidateProfileId}`}
-                state={{ application }}
-                onClick={e => isDragging && e.preventDefault()}
-                className="group flex flex-col gap-3 bg-white/[0.04] border border-white/[0.07] hover:border-teal-500/30 hover:bg-white/[0.06] rounded-xl p-4 transition-colors cursor-grab active:cursor-grabbing"
-            >
-                <div>
-                    <p className="text-sm font-semibold text-white group-hover:text-teal-400 transition-colors leading-snug">
-                        {application.candidateName ?? "Unknown"}
-                    </p>
-                    {meta && <p className="text-xs text-stone-500 mt-0.5">{meta}</p>}
-                    <p className="text-xs text-stone-700 mt-1">
-                        {formatDistanceToNow(new Date(application.appliedAt), { addSuffix: true })}
-                    </p>
-                </div>
+            <div className="group flex flex-col gap-3 bg-white/[0.04] border border-white/[0.07] hover:border-teal-500/30 hover:bg-white/[0.06] rounded-xl p-4 transition-colors">
+                <Link
+                    to={`${application.candidateProfileId}`}
+                    state={{ application }}
+                    onClick={e => isDragging && e.preventDefault()}
+                    className={`flex flex-col gap-3 ${!noDrag ? "cursor-grab active:cursor-grabbing" : ""}`}
+                >
+                    <div>
+                        <p className="text-sm font-semibold text-white group-hover:text-teal-400 transition-colors leading-snug">
+                            {application.candidateName ?? "Unknown"}
+                        </p>
+                        {meta && <p className="text-xs text-stone-500 mt-0.5">{meta}</p>}
+                        <p className="text-xs text-stone-700 mt-1">
+                            {formatDistanceToNow(new Date(application.appliedAt), { addSuffix: true })}
+                        </p>
+                    </div>
 
-                <div className="border-t border-white/[0.05] pt-3">
-                    {application.hasConnected ? (
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-                            <Signal icon={<Zap size={11} />} label="Activity" value={application.activityScore} />
-                            <Signal icon={<Star size={11} />} label="Popularity" value={application.popularityScore} />
-                            <Signal icon={<PackageOpen size={11} />} label="Maturity" value={application.repoMaturityScore} />
-                            <Signal icon={<GitPullRequest size={11} />} label="Ext. PRs" value={application.externalPrCount} />
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-1.5 text-stone-700">
-                            <GitPullRequest size={12} />
-                            <span className="text-xs">No GitHub connected</span>
-                        </div>
-                    )}
-                </div>
-            </Link>
+                    <div className="border-t border-white/[0.05] pt-3">
+                        {application.hasConnected ? (
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                                <Signal icon={<Zap size={11} />} label="Activity" value={application.activityScore} />
+                                <Signal icon={<Star size={11} />} label="Popularity" value={application.popularityScore} />
+                                <Signal icon={<PackageOpen size={11} />} label="Maturity" value={application.repoMaturityScore} />
+                                <Signal icon={<GitPullRequest size={11} />} label="Ext. PRs" value={application.externalPrCount} />
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-1.5 text-stone-700">
+                                <GitPullRequest size={12} />
+                                <span className="text-xs">No GitHub connected</span>
+                            </div>
+                        )}
+                    </div>
+                </Link>
+
+                {(onMoveToScreening || onReject) && (
+                    <div className={`grid gap-2 ${onMoveToScreening && onReject ? "grid-cols-2" : "grid-cols-1"}`}>
+                        {onMoveToScreening && (
+                            <button
+                                onClick={() => onMoveToScreening(application.id)}
+                                className="flex items-center justify-center gap-1.5 text-xs text-stone-500 hover:text-teal-400 border border-white/[0.06] hover:border-teal-500/30 rounded-lg py-1.5 transition-colors"
+                            >
+                                <ArrowRight size={11} />
+                                Screening
+                            </button>
+                        )}
+                        {onReject && (
+                            <button
+                                onClick={() => onReject(application.id)}
+                                className="flex items-center justify-center gap-1.5 text-xs text-stone-500 hover:text-red-400 border border-white/[0.06] hover:border-red-500/30 rounded-lg py-1.5 transition-colors"
+                            >
+                                <X size={11} />
+                                Reject
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

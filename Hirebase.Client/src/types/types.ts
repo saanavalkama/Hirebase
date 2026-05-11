@@ -285,3 +285,19 @@ export interface InboxFeedResponse{
     hasPreviousPage: boolean
 }
 
+export type ApplicationSatge = 
+  | "Applied"
+  | "Screening"
+  | "Interview"
+  | "Offer"
+  | "Rejected"
+
+export interface UpdateApplicationRequest{
+    applicationId:string,
+    stage: ApplicationSatge
+}
+
+export interface UpdateStageMutationProps{
+    jobPostingId:string
+}
+

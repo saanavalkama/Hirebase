@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom"
 import { useJobPostingById } from "@/features/jobPosting/hooks/jobPostingHooks"
-import { useApply, useGetAllJobIds } from "@/features/application/hooks/useApplicationHooks";
+import { useApply, useGetAllJobIds, useWithdraw } from "@/features/application/hooks/useApplicationHooks";
 
 function Badge({ label }: { label: string }) {
     return (
@@ -23,6 +23,7 @@ export default function JobPostingDetail() {
     const { id } = useParams<{ id: string }>()
     const { data: job, isPending, isError } = useJobPostingById(id ?? "")
     const {mutate: apply, isPending:isApplyPending, isError:isApplyError} = useApply()
+    const { mutate: withdraw, isPending: isWithdrawPending } = useWithdraw()
     const { data: appliedIds } = useGetAllJobIds()
     const hasApplied = appliedIds?.includes(id ?? "") ?? false
 
@@ -117,14 +118,25 @@ export default function JobPostingDetail() {
                     <p>Posted <span className="text-stone-400">{new Date(job.createdAt).toLocaleDateString()}</span></p>
                 </div>
 
-                {/* Apply button */}
-                <button
-                    onClick={handleApply}
-                    disabled={isApplyPending || hasApplied}
-                    className="w-full py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-[#18181f] font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {isApplyPending ? 'Applying...' : hasApplied ? 'Already applied' : 'Apply'}
-                </button>
+                {/* Apply / Withdraw */}
+                <div className="flex flex-col gap-2">
+                    <button
+                        onClick={handleApply}
+                        disabled={isApplyPending || hasApplied}
+                        className="w-full py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-[#18181f] font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isApplyPending ? 'Applying...' : hasApplied ? 'Already applied' : 'Apply'}
+                    </button>
+                    {hasApplied && (
+                        <button
+                            onClick={() => withdraw({ jobPostingId: id! })}
+                            disabled={isWithdrawPending}
+                            className="w-full py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isWithdrawPending ? 'Withdrawing...' : 'Withdraw application'}
+                        </button>
+                    )}
+                </div>
 
             </main>
         </div>

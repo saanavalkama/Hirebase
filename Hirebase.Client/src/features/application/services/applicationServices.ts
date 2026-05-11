@@ -1,5 +1,5 @@
 import { api } from "@/lib/api"
-import {type InboxFeedResponse, type InboxRequest, type JobPostingRequest, type ApplyResponse, type RecruiterApplicationResponse } from "@/types/types"
+import {type InboxFeedResponse, type InboxRequest, type JobPostingRequest, type ApplyResponse, type RecruiterApplicationResponse, type UpdateApplicationRequest } from "@/types/types"
 
 const BASE_URL = `/api/application`
 
@@ -30,5 +30,15 @@ export const applicationServices = {
     getPipeline: async(data:JobPostingRequest):Promise<RecruiterApplicationResponse[]> => {
         const response = await api.get<RecruiterApplicationResponse[]>(`${BASE_URL}/recruiter/${data.jobPostingId}/pipeline`)
         return response.data
+    },
+
+    updateApplicationStage: async(data:UpdateApplicationRequest):Promise<ApplyResponse> => {
+        const response = await api.patch<ApplyResponse>(`${BASE_URL}/${data.applicationId}/stage`, { stage: data.stage })
+        return response.data
+    },
+
+    withdrawn: async(data:JobPostingRequest):Promise<void> => {
+        await api.delete(`${BASE_URL}/${data.jobPostingId}`)
+
     }
 }

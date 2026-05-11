@@ -1,4 +1,4 @@
-import type { InboxRequest, JobPostingRequest } from "@/types/types"
+import type { InboxRequest, JobPostingRequest, UpdateApplicationRequest, UpdateStageMutationProps } from "@/types/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { applicationServices } from "../services/applicationServices"
 import { toast } from "sonner"
@@ -54,7 +54,7 @@ export const useInbox = (data:InboxRequest) => {
     return useQuery({
         queryKey:['inbox', me?.userId, data.jobPostingId, data.page, data.pageSize],
         queryFn:() => applicationServices.getInbox(data),
-        enabled:!!me || !data,
+        enabled:!!me && !!data.jobPostingId,
         staleTime:1000*60*5
     })
 }
@@ -62,9 +62,43 @@ export const useInbox = (data:InboxRequest) => {
 export const usePipeline = (data:JobPostingRequest) => {
     const {data:me} = useMe()
     return useQuery({
-        queryKey:['pipeline',me?.userId],
+        queryKey:['pipeline',me?.userId,data.jobPostingId],
         queryFn:()=>applicationServices.getPipeline(data),
-        enabled:!!me || !!data,
+        enabled:!!me && !!data,
         staleTime: 1000 * 60 * 5
+    })
+}
+
+export const useUpdateApplicationStage = (data:UpdateStageMutationProps) => {
+    const queryClient = useQueryClient()
+    const {data:me} = useMe()
+    return useMutation({
+        mutationFn:(data:UpdateApplicationRequest)=>applicationServices.updateApplicationStage(data),
+        onSuccess:()=>{
+            queryClient.invalidateQueries({queryKey:['pipeline',me?.userId,data.jobPostingId]})
+            queryClient.invalidateQueries({queryKey:['inbox',me?.userId,data.jobPostingId]})
+            toast.success("Update was succesfull")
+        },
+        onError:(err)=>{
+            //makes sure optimistic UI rolls back
+            queryClient.invalidateQueries({ queryKey: ['pipeline', me?.userId, data.jobPostingId] })
+            queryClient.invalidateQueries({ queryKey: ['inbox', me?.userId, data.jobPostingId] })
+            toast.error(getErrorMessage(err,"Something went wrong while updating the stage"))}
+
+    })
+}
+
+export const useWithdraw = () => {
+    const {data:me} = useMe()
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn:(data:JobPostingRequest) => applicationServices.withdrawn(data),
+        onSuccess:()=>{
+            toast.success("You have succesfully withdrawn your application")
+            queryClient.invalidateQueries({queryKey:['candidateAppliedJobIds',me?.userId]})
+            queryClient.invalidateQueries({queryKey:['applications',me?.userId]}) 
+
+        },
+        onError:(err)=>toast.error(getErrorMessage(err, "something went wrong while withdrawing the application"))
     })
 }

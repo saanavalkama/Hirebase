@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns"
 import { Link } from "react-router-dom"
-import { getMyApplications } from "@/features/application/hooks/useApplicationHooks"
+import { getMyApplications, useWithdraw } from "@/features/application/hooks/useApplicationHooks"
 import type { ApplyResponse } from "@/types/types"
 import DashboardHeader from "../components/DashboardHeader"
 import { useCandidateProfile } from "../hooks/useCandidateQuery"
@@ -57,6 +57,8 @@ function StageStepper({ stage }: { stage: string }) {
 }
 
 function ApplicationCard({ app }: { app: ApplyResponse }) {
+    const { mutate: withdraw, isPending: isWithdrawPending } = useWithdraw()
+
     return (
         <div className="bg-white/[0.04] rounded-2xl border border-white/[0.07] p-6 flex flex-col gap-5">
             <div className="flex items-start justify-between">
@@ -83,9 +85,11 @@ function ApplicationCard({ app }: { app: ApplyResponse }) {
                 <Button
                     variant="ghost"
                     size="sm"
+                    disabled={isWithdrawPending}
+                    onClick={() => withdraw({ jobPostingId: app.jobPostingId })}
                     className="text-stone-500 hover:text-red-400 hover:bg-red-500/10 border border-white/[0.07] rounded-full text-xs"
                 >
-                    Withdraw
+                    {isWithdrawPending ? "Withdrawing..." : "Withdraw"}
                 </Button>
             </div>
         </div>
