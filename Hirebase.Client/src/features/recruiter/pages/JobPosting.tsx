@@ -21,7 +21,7 @@ import {
   CommandList,
 } from "@/components/ui/command"
 import { LANGUAGES } from "../data/languages"
-import { useCreateJobPosting, useJobPostingById, useUpdateJobPosting } from "../hooks/jobPostingHooks"
+import { useCreateJobPosting, useJobPostingById, useUpdateJobPosting } from "../../jobPosting/hooks/jobPostingHooks"
 import { ChevronsUpDownIcon, XIcon } from "lucide-react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { useEffect, useState } from "react"

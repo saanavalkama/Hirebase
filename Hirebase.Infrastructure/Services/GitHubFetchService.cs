@@ -11,27 +11,31 @@ using Microsoft.Extensions.Logging;
 using Hirebase.Domain.Exceptions;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using MediatR;
+using Hirebase.Application.Events;
 
 namespace Hirebase.Infrastructure.Services;
 public class GitHubFetchService : IGitHubFetchService
 {
     private readonly AppDbContext _db;
     private readonly ITokenEncryptionService _encryption;
-
     private readonly HttpClient _http;
-
     private readonly ILogger<GitHubFetchService> _logger;
+
+    private readonly IMediator _mediator;
     public GitHubFetchService(
         AppDbContext db,
         ITokenEncryptionService encryption,
         HttpClient http,
-        ILogger<GitHubFetchService> logger
+        ILogger<GitHubFetchService> logger,
+        IMediator meditor
     )
     {
         _db = db;
         _encryption = encryption;
         _http = http;
         _logger = logger;
+        _mediator = meditor;
     }
 
     public async Task FetchAndCalculateAsync(Guid gitHubProfileId, CancellationToken ct = default)
@@ -80,6 +84,7 @@ public class GitHubFetchService : IGitHubFetchService
 
             profile.FetchStatus = FetchStatus.Done;
             await _db.SaveChangesAsync(ct);
+            await _mediator.Publish(new GitHubSignalsUpdatedEvent(profile.CandidateProfileId));
 
             _logger.LogInformation("Signals calculated");
 

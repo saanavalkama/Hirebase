@@ -4,6 +4,7 @@ using Hirebase.API.Settings;
 using Hirebase.API.Middleware;
 using Hirebase.Application.Interfaces;
 using Hirebase.Application.Interfaces.Recruiter;
+using Hirebase.Application.Interfaces.Application;
 using Hirebase.Infrastructure.Services;
 using Hirebase.Infrastructure.Repositories;
 using Hirebase.Infrastructure.Repositories.Recruiter;
@@ -16,6 +17,8 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hirebase.Application.Validators;
 using Hirebase.Application.Settings;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +70,21 @@ builder.Services.AddHostedService<GitHubFetchBackgroundJob>();
 builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped<IPotentialMatchRepository, PotentialMatchRepository>();
+builder.Services.AddScoped<IPotentialMatchService, PotentialMatchService>();
+
+//MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationService).Assembly));
+
+//Hangfire
+builder.Services.AddHangfire(config => config
+    .UsePostgreSqlStorage(options =>
+        options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"))));
+builder.Services.AddHangfireServer();
+
+
 
 builder.Services.AddCors(options =>
 {
@@ -103,12 +121,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseRouting();
 app.UseCors("AllowClient");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseHangfireDashboard("/hangfire");
 app.Run();
 
 public partial class Program{}

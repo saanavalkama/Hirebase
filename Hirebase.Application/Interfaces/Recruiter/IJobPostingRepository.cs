@@ -10,4 +10,10 @@ public interface IJobPostingRepository
     Task<JobPosting?> GetById(Guid id);
     Task<List<JobPosting>> GetByOrganizationId(Guid organizationId);
     Task<List<JobPosting>> GetByRecruiterProfileId(Guid recruiterProfileId);
+
+    Task<List<JobPosting>> GetActivePaginated(int page, int pageSize);
+
+    Task<int>CountActive();
+
+    Task<List<JobPosting>>GetAllActive();
 }

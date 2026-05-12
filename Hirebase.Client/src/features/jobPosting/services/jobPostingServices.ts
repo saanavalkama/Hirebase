@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { CreateJobPostingRequest, JobPostingResponse, UpdateJobPostingRequest } from "@/types/types";
+import type { CreateJobPostingRequest, JobFeedRequest, JobFeedResponse, JobPostingResponse, UpdateJobPostingRequest } from "@/types/types";
 
 const BASE_URL = "/api/recruiter/jobpostings"
 
@@ -28,6 +28,11 @@ export const jobPostingServices = {
 
     deletePosting:async(id:string)=>{
         await api.delete(`${BASE_URL}/${id}`)
-    }
+    },
+
+    getFeed: async(data:JobFeedRequest):Promise<JobFeedResponse> => {
+        const response = await api.get<JobFeedResponse>(`${BASE_URL}/feed?page=${data.page}&pageSize=${data.pageSize}`)
+        return response.data
+    } 
 
 }

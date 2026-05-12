@@ -1,5 +1,6 @@
 using Hirebase.Application.Interfaces.Recruiter;
 using Hirebase.Domain.Entities.Recruiter;
+using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
 using Hirebase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +57,32 @@ public class JobPostingRepository : IJobPostingRepository
         return await _context.JobPostings
             .Include(j => j.Organization)
             .Where(j => j.Organization.RecruiterProfileId == recruiterProfileId)
+            .ToListAsync();
+    }
+
+    public async Task<List<JobPosting>>GetActivePaginated(int page, int pageSize)
+    {
+        return await _context.JobPostings
+            .Where(j => j.Status == JobPostingStatus.Open)
+            .OrderByDescending(j => j.CreatedAt)
+            .Skip((page-1)*pageSize)
+            .Take(pageSize)
+            .Include(j => j.Organization)
+            .ToListAsync();
+    }
+
+    public async Task<int> CountActive()
+    {
+        return await _context.JobPostings
+            .Where(j => j.Status == JobPostingStatus.Open)
+            .CountAsync();
+    }
+
+    public async Task<List<JobPosting>>GetAllActive()
+    {
+        return await _context.JobPostings
+            .Include(j => j.Organization)
+            .Where(j => j.Status == JobPostingStatus.Open)
             .ToListAsync();
     }
 }

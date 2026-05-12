@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { useDeleteJobPosting, useRecruitersPostings } from "../hooks/jobPostingHooks"
+import { useDeleteJobPosting, useRecruitersPostings } from "../../jobPosting/hooks/jobPostingHooks"
 import type { JobPostingResponse, JobPostingStatus } from "@/types/types"
 import {
   Dialog,
@@ -122,6 +122,16 @@ export default function JobPostingsList() {
                                     </div>
 
                                     <div className="flex items-center gap-2 shrink-0">
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className="border-white/[0.1] text-stone-300 hover:bg-white/[0.06] hover:text-white"
+                                        >
+                                            <Link to={`/app/recruiter/${posting.id}/pipeline`}>
+                                                Pipeline
+                                            </Link>
+                                        </Button>
                                         <Button
                                             asChild
                                             variant="outline"

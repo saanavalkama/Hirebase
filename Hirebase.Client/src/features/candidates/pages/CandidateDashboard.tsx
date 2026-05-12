@@ -1,7 +1,7 @@
+import { Link } from "react-router-dom"
 import DashboardHeader from "../components/DashboardHeader"
 import DiscoverCard from "../components/DiscoverCard"
 import OverviewCard from "../components/OverviewCard"
-import RecentMatchesCard from "../components/RecentMatchesCard"
 import ProfileCard from "../components/ProfileCard"
 
 const DUMMY_CANDIDATE = {
@@ -26,7 +26,18 @@ export default function CandidateDashboard() {
                 <div className="grid grid-cols-2 gap-5">
                     <DiscoverCard />
                     <OverviewCard />
-                    <RecentMatchesCard />
+                    <Link
+                        to="/app/candidate/applications"
+                        className="flex flex-col justify-between rounded-2xl border border-stone-800 bg-stone-900/60 p-6 hover:border-teal-500/50 hover:bg-stone-900 transition-colors"
+                    >
+                        <div>
+                            <h2 className="text-base font-semibold text-white">Overview of Applications</h2>
+                            <p className="mt-1 text-sm text-stone-500">Track the status of all your job applications</p>
+                        </div>
+                        <span className="mt-6 inline-flex items-center gap-1 text-sm font-medium text-teal-400">
+                            View applications <span aria-hidden>→</span>
+                        </span>
+                    </Link>
                     <ProfileCard />
                 </div>
             </main>

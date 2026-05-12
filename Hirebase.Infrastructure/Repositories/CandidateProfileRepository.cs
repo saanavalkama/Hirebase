@@ -3,6 +3,7 @@ using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Hirebase.Domain.Enums;
+using Hirebase.Domain.Exceptions;
 
 namespace Hirebase.Infrastructure.Repositories;
 
@@ -66,6 +67,27 @@ public class CandidateProfileRepository : ICandidateProfileRepository
 
     return profile;
 }
+
+public async Task<List<CandidateProfile>> GetAllProfiles()
+    {
+        var profiles = await _context.CandidateProfiles
+        .Include(c => c.SoftSkills)
+        .Include(c => c.PreferredRoles)
+        .Include(c => c.GitHubProfile).ThenInclude(g => g.Signals)
+        .Where(c => c.SeniorityLevel != null)
+        .ToListAsync();
+        return profiles;
+
+    }
+
+public async Task<CandidateProfile?> GetProfileById(Guid candidateProfileId)
+    {
+        return await _context.CandidateProfiles
+        .Include(c => c.SoftSkills)
+        .Include(c => c.PreferredRoles)
+        .Include(c => c.GitHubProfile).ThenInclude(g => g.Signals)
+        .FirstOrDefaultAsync(c => c.Id == candidateProfileId);
+    }
 
 
 }

@@ -12,6 +12,11 @@ import Profile from '@/features/recruiter/pages/Profile';
 import OrganizationPage from '@/features/recruiter/pages/OrganizationPage';
 import JobPosting from '@/features/recruiter/pages/JobPosting'
 import JobPostingsList from '@/features/recruiter/pages/JobPostingsList';
+import Pipeline from '@/features/recruiter/pages/Pipeline';
+import CandidateDetail from '@/features/recruiter/pages/CandidateDetail';
+import JobFeed from '@/features/candidates/pages/JobFeed';
+import JobPostingDetail from '@/features/candidates/pages/JobPostingDetail';
+import Applications from '@/features/candidates/pages/Applications';
 
 
 export const router = createBrowserRouter([
@@ -33,7 +38,10 @@ export const router = createBrowserRouter([
         children:[
             {index: true, element: <Navigate to="dashboard" />},
             {path:"dashboard", element: <CandidateDashboard />},
-            {path:"profile", element:<ProfileForm />}
+            {path:"profile", element:<ProfileForm />},
+            {path:"feed", element: <JobFeed />},
+            {path:"feed/:id", element: <JobPostingDetail />},
+            {path:"applications", element:<Applications />}
         ]
     },
     {
@@ -45,7 +53,9 @@ export const router = createBrowserRouter([
             {path:"profile/edit", element:<Profile />},
             {path:"organizations",element:<OrganizationPage /> },
             {path:"jobPosting", element:<JobPosting />},
-            {path:"jobPostings", element:<JobPostingsList />}
+            {path:"jobPostings", element:<JobPostingsList />},
+            {path:":jobPostingId/pipeline", element:<Pipeline />},
+            {path:":jobPostingId/pipeline/:candidateProfileId", element:<CandidateDetail />}
         ]
         
     }

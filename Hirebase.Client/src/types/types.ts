@@ -210,3 +210,98 @@ export interface UpdateJobPostingRequest{
     preferredRole?: string,
     jobPostingSoftSkills?: string[],
 }
+
+export interface JobFeedResponse{
+    items: JobPostingResponse[],
+    page: number,
+    pageSize: number,
+    totalCount: number,
+    totalPages: number,
+    hasNextPage: boolean,
+    hasPreviousPage: boolean
+}
+
+export interface JobFeedRequest{
+    page: number,
+    pageSize: number
+}
+
+export interface JobPostingRequest{
+    jobPostingId: string
+}
+
+export interface ApplyResponse{
+    id: string,
+    jobPostingId: string,
+    jobTitle: string,
+    organizationName: string,
+    roleType: string | null,
+    seniorityLevel: string | null,
+    remotePreference: string | null,
+    candidateProfileId: string,
+    candidateName: string | null,
+    stage: string,
+    appliedAt: string,
+    updatedAt: string,
+}
+
+export interface RecruiterApplicationResponse{
+    id:string,
+    stage: string,
+    appliedAt:string,
+    updatedAt:string,
+    candidateProfileId:string,
+    candidateName:string | null,
+    location: string | null,
+    bio:string | null,
+    seniorityLevel:SeniorityLevel | null,
+    yearsOfExperience: number | null,
+    cvUrl:string | null,
+    linkedInUrl:string | null,
+    personalSiteUrl:string | null,
+    activityScore:number,
+    repoMaturityScore:number,
+    popularityScore:number, 
+    topLanguages: string[],
+    externalPrCount: number,
+    hasConnected:boolean,
+    softSkills:string[]
+    preferredRoles:string[]
+}
+
+export interface InboxRequest {
+    jobPostingId: string,
+    page: number,
+    pageSize: number,
+}
+
+export interface InboxFeedResponse{
+    items: RecruiterApplicationResponse[],
+    page: number,
+    pageSize: number,
+    totalCount: number,
+    totalPages: number,
+    hasNextPage: boolean,
+    hasPreviousPage: boolean
+}
+
+export type ApplicationSatge = 
+  | "Applied"
+  | "Screening"
+  | "Interview"
+  | "Offer"
+  | "Rejected"
+
+export interface UpdateApplicationRequest{
+    applicationId:string,
+    stage: ApplicationSatge
+}
+
+export interface UpdateStageMutationProps{
+    jobPostingId:string
+}
+
+export type PotentialMatchResponse = {
+    jobPostingId: string
+    tier: "Partial" | "GoodFit" | "StrongFit"
+}

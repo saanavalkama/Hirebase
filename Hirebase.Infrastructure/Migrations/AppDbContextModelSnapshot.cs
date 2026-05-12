@@ -22,6 +22,36 @@ namespace Hirebase.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Hirebase.Domain.Entities.Application.CandidateApplication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ApplicationStage")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("AppliedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CandidateProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("JobPostingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateProfileId");
+
+                    b.HasIndex("JobPostingId");
+
+                    b.ToTable("CandidateApplications");
+                });
+
             modelBuilder.Entity("Hirebase.Domain.Entities.Auth.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -281,6 +311,34 @@ namespace Hirebase.Infrastructure.Migrations
                     b.ToTable("SoftSkills");
                 });
 
+            modelBuilder.Entity("Hirebase.Domain.Entities.Matching.PotentialMatch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CalculatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CandidateProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("JobPostingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Tier")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobPostingId");
+
+                    b.HasIndex("CandidateProfileId", "JobPostingId")
+                        .IsUnique();
+
+                    b.ToTable("PotentialMatches");
+                });
+
             modelBuilder.Entity("Hirebase.Domain.Entities.Recruiter.JobPosting", b =>
                 {
                     b.Property<Guid>("Id")
@@ -400,6 +458,25 @@ namespace Hirebase.Infrastructure.Migrations
                     b.ToTable("RecruiterProfiles");
                 });
 
+            modelBuilder.Entity("Hirebase.Domain.Entities.Application.CandidateApplication", b =>
+                {
+                    b.HasOne("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", "CandidateProfile")
+                        .WithMany("Applications")
+                        .HasForeignKey("CandidateProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hirebase.Domain.Entities.Recruiter.JobPosting", "JobPosting")
+                        .WithMany("Applications")
+                        .HasForeignKey("JobPostingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CandidateProfile");
+
+                    b.Navigation("JobPosting");
+                });
+
             modelBuilder.Entity("Hirebase.Domain.Entities.Auth.RefreshToken", b =>
                 {
                     b.HasOne("Hirebase.Domain.Entities.Auth.User", "User")
@@ -466,6 +543,25 @@ namespace Hirebase.Infrastructure.Migrations
                     b.Navigation("CandidateProfile");
                 });
 
+            modelBuilder.Entity("Hirebase.Domain.Entities.Matching.PotentialMatch", b =>
+                {
+                    b.HasOne("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", "CandidateProfile")
+                        .WithMany()
+                        .HasForeignKey("CandidateProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hirebase.Domain.Entities.Recruiter.JobPosting", "JobPosting")
+                        .WithMany()
+                        .HasForeignKey("JobPostingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CandidateProfile");
+
+                    b.Navigation("JobPosting");
+                });
+
             modelBuilder.Entity("Hirebase.Domain.Entities.Recruiter.JobPosting", b =>
                 {
                     b.HasOne("Hirebase.Domain.Entities.Recruiter.Organization", "Organization")
@@ -506,6 +602,8 @@ namespace Hirebase.Infrastructure.Migrations
 
             modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", b =>
                 {
+                    b.Navigation("Applications");
+
                     b.Navigation("GitHubProfile");
 
                     b.Navigation("PreferredRoles");
@@ -516,6 +614,11 @@ namespace Hirebase.Infrastructure.Migrations
             modelBuilder.Entity("Hirebase.Domain.Entities.CandidateProfiles.GitHubProfile", b =>
                 {
                     b.Navigation("Signals");
+                });
+
+            modelBuilder.Entity("Hirebase.Domain.Entities.Recruiter.JobPosting", b =>
+                {
+                    b.Navigation("Applications");
                 });
 
             modelBuilder.Entity("Hirebase.Domain.Entities.Recruiter.Organization", b =>

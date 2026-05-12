@@ -1,11 +1,15 @@
 // JobPostingService.cs
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Hirebase.Application.DTOs.Common;
 using Hirebase.Application.DTOs.Recruiter;
+using Hirebase.Application.Events;
 using Hirebase.Application.Interfaces.Recruiter;
 using Hirebase.Domain.Entities.Recruiter;
 using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
+using MediatR;
 
 namespace Hirebase.Application.Services.Recruiter;
 
@@ -14,10 +18,16 @@ public class JobPostingService : IJobPostingService
     private readonly IJobPostingRepository _repo;
     private readonly IOrganizationRepository _orgRepo;
 
-    public JobPostingService(IJobPostingRepository repo, IOrganizationRepository orgRepo)
+    private readonly IMediator _mediator;
+
+    public JobPostingService(
+        IJobPostingRepository repo, 
+        IOrganizationRepository orgRepo,
+        IMediator mediator)
     {
         _repo = repo;
         _orgRepo = orgRepo;
+        _mediator = mediator;
     }
 
     public async Task<JobPostingResponseDto> Create(CreateJobPostingDto dto, Guid recruiterProfileId)
@@ -50,6 +60,7 @@ public class JobPostingService : IJobPostingService
         };
 
         var saved = await _repo.Create(posting);
+        await _mediator.Publish(new JobPostingCreatedEvent(saved.Id));
         return MapToDto(saved);
     }
 
@@ -76,6 +87,7 @@ public class JobPostingService : IJobPostingService
         posting.UpdatedAt = DateTime.UtcNow;
 
         var updated = await _repo.Update(posting);
+        await _mediator.Publish(new JobPostingUpdatedEvent(updated.Id));
         return MapToDto(updated);
     }
 
@@ -101,6 +113,24 @@ public class JobPostingService : IJobPostingService
     {
         var postings = await _repo.GetByRecruiterProfileId(recruiterProfileId);
         return postings.Select(MapToDto).ToList();
+    }
+
+   public async Task<PaginatedResponse<JobPostingResponseDto>>GetFeed(int page, int pageSize)
+    {
+        if(pageSize > 50 ) pageSize = 50;
+
+        var total = await _repo.CountActive();
+        var postings = await _repo.GetActivePaginated(page, pageSize);
+
+        return new PaginatedResponse<JobPostingResponseDto>(
+            Items: postings.Select(MapToDto).ToList(),
+            Page: page,
+            PageSize:pageSize,
+            TotalCount: total,
+            TotalPages: (int)Math.Ceiling(total / (double)(pageSize)),
+            HasNextPage: page*pageSize < total,
+            HasPreviousPage: page > 1
+        );
     }
 
     private JobPostingResponseDto MapToDto(JobPosting posting) => new(

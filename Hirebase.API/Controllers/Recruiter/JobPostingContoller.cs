@@ -65,4 +65,11 @@ public class JobPostingController : ControllerBase
         await _service.Delete(id, recruiter.Id);
         return NoContent();
     }
+
+    [HttpGet("feed")]
+    public async Task<IActionResult> GetFeed([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        var feed = await _service.GetFeed(page, pageSize);
+        return Ok(feed);
+    }
 }

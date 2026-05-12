@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import type { JobPostingStatus } from "@/types/types"
-import { useRecruitersPostings } from "../hooks/jobPostingHooks"
+import { useRecruitersPostings } from "../../jobPosting/hooks/jobPostingHooks"
 
 const statusStyles: Record<JobPostingStatus, string> = {
     Open: "bg-teal-500/15 text-teal-400 border-teal-500/30",

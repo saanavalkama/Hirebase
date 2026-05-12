@@ -1,3 +1,4 @@
+using Hirebase.Domain.Entities.Application;
 using Hirebase.Domain.Enums;
 
 namespace Hirebase.Domain.Entities.Recruiter;
@@ -37,5 +38,7 @@ public class JobPosting
     public string? PreferredRole {get;set;}
 
     public string? JobPostingSoftSkills {get;set;}
+
+    public ICollection<CandidateApplication> Applications {get;set;} = [];
 
 }
