@@ -77,4 +77,12 @@ public class JobPostingRepository : IJobPostingRepository
             .Where(j => j.Status == JobPostingStatus.Open)
             .CountAsync();
     }
+
+    public async Task<List<JobPosting>>GetAllActive()
+    {
+        return await _context.JobPostings
+            .Include(j => j.Organization)
+            .Where(j => j.Status == JobPostingStatus.Open)
+            .ToListAsync();
+    }
 }

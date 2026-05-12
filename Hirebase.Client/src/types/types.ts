@@ -301,3 +301,7 @@ export interface UpdateStageMutationProps{
     jobPostingId:string
 }
 
+export type PotentialMatchResponse = {
+    jobPostingId: string
+    tier: "Partial" | "GoodFit" | "StrongFit"
+}

@@ -3,6 +3,7 @@ using System;
 using Hirebase.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hirebase.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260511110340_AddPotentialMatch")]
+    partial class AddPotentialMatch
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -311,34 +314,6 @@ namespace Hirebase.Infrastructure.Migrations
                     b.ToTable("SoftSkills");
                 });
 
-            modelBuilder.Entity("Hirebase.Domain.Entities.Matching.PotentialMatch", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CalculatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("CandidateProfileId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("JobPostingId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Tier")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("JobPostingId");
-
-                    b.HasIndex("CandidateProfileId", "JobPostingId")
-                        .IsUnique();
-
-                    b.ToTable("PotentialMatches");
-                });
-
             modelBuilder.Entity("Hirebase.Domain.Entities.Recruiter.JobPosting", b =>
                 {
                     b.Property<Guid>("Id")
@@ -541,25 +516,6 @@ namespace Hirebase.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("CandidateProfile");
-                });
-
-            modelBuilder.Entity("Hirebase.Domain.Entities.Matching.PotentialMatch", b =>
-                {
-                    b.HasOne("Hirebase.Domain.Entities.CandidateProfiles.CandidateProfile", "CandidateProfile")
-                        .WithMany()
-                        .HasForeignKey("CandidateProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Hirebase.Domain.Entities.Recruiter.JobPosting", "JobPosting")
-                        .WithMany()
-                        .HasForeignKey("JobPostingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CandidateProfile");
-
-                    b.Navigation("JobPosting");
                 });
 
             modelBuilder.Entity("Hirebase.Domain.Entities.Recruiter.JobPosting", b =>

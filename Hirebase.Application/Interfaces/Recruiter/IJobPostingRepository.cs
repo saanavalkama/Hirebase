@@ -14,4 +14,6 @@ public interface IJobPostingRepository
     Task<List<JobPosting>> GetActivePaginated(int page, int pageSize);
 
     Task<int>CountActive();
+
+    Task<List<JobPosting>>GetAllActive();
 }

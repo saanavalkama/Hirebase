@@ -17,6 +17,8 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hirebase.Application.Validators;
 using Hirebase.Application.Settings;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +72,19 @@ builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped<IPotentialMatchRepository, PotentialMatchRepository>();
+builder.Services.AddScoped<IPotentialMatchService, PotentialMatchService>();
+
+//MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationService).Assembly));
+
+//Hangfire
+builder.Services.AddHangfire(config => config
+    .UsePostgreSqlStorage(options =>
+        options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"))));
+builder.Services.AddHangfireServer();
+
+
 
 builder.Services.AddCors(options =>
 {
@@ -113,6 +128,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseHangfireDashboard("/hangfire");
 app.Run();
 
 public partial class Program{}

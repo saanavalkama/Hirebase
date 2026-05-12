@@ -2,21 +2,40 @@ import { useGetFeed } from "@/features/jobPosting/hooks/jobPostingHooks"
 import { useGetAllJobIds } from "@/features/application/hooks/useApplicationHooks"
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import type { JobPostingResponse } from "@/types/types"
+import type { JobPostingResponse, PotentialMatchResponse } from "@/types/types"
+import { useMyMatches } from "@/features/matching/hooks/usePotentialMatchHooks"
 
-function JobCard({ job, applied }: { job: JobPostingResponse; applied: boolean }) {
+const TIER_CONFIG: Record<PotentialMatchResponse["tier"], { label: string; className: string }> = {
+    Partial:   { label: "Partial Match", className: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20" },
+    GoodFit:   { label: "Good Match",    className: "bg-teal-500/10 text-teal-400 border border-teal-500/20" },
+    StrongFit: { label: "Great Match",   className: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" },
+}
+
+function MatchBadge({ tier }: { tier: PotentialMatchResponse["tier"] }) {
+    const { label, className } = TIER_CONFIG[tier]
+    return (
+        <span className={`self-start text-[10px] font-medium px-2 py-0.5 rounded-full ${className}`}>
+            {label}
+        </span>
+    )
+}
+
+function JobCard({ job, applied, tier }: { job: JobPostingResponse; applied: boolean; tier?: PotentialMatchResponse["tier"] }) {
     return (
         <Link to={`/app/candidate/feed/${job.id}`} className="block h-full">
             <div className={`rounded-xl p-5 h-full flex flex-col gap-3 transition-colors ${
                 applied
                     ? "bg-emerald-950/40 border border-emerald-700/50 hover:border-emerald-500/70 hover:bg-emerald-950/60"
+                    : tier
+                    ? "bg-[#1e1e28] border border-teal-700/40 hover:border-teal-600/60 hover:bg-[#21212d]"
                     : "bg-[#1e1e28] border border-stone-700/60 hover:border-stone-600 hover:bg-[#21212d]"
             }`}>
-                <div>
+                <div className="flex flex-col gap-1.5">
+                    {tier && <MatchBadge tier={tier} />}
                     <h3 className="text-white font-semibold text-sm leading-snug">{job.title}</h3>
-                    <p className="text-teal-400 text-xs mt-1">{job.organizationName}</p>
+                    <p className="text-teal-400 text-xs">{job.organizationName}</p>
                     {job.preferredRole && (
-                        <p className="text-stone-400 text-xs mt-0.5">{job.preferredRole.replace(/([A-Z])/g, ' $1').trim()}</p>
+                        <p className="text-stone-400 text-xs">{job.preferredRole.replace(/([A-Z])/g, ' $1').trim()}</p>
                     )}
                 </div>
 
@@ -66,7 +85,10 @@ function JobCard({ job, applied }: { job: JobPostingResponse; applied: boolean }
 export default function JobFeed() {
     const [page, setPage] = useState(1)
     const { data: feed, isPending, isError } = useGetFeed({ page, pageSize: 12 })
+    const { data: matches } = useMyMatches()
     const { data: appliedIds } = useGetAllJobIds()
+
+    const matchMap = new Map(matches?.map(m => [m.jobPostingId, m.tier]))
 
 
     if (isPending) return (
@@ -95,7 +117,7 @@ export default function JobFeed() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {feed?.items.map(job => (
-                        <JobCard key={job.id} job={job} applied={appliedIds?.includes(job.id) ?? false} />
+                        <JobCard key={job.id} job={job} applied={appliedIds?.includes(job.id) ?? false} tier={matchMap.get(job.id)} />
                     ))}
                 </div>
 

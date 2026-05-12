@@ -1,8 +1,10 @@
 using Hirebase.Application.DTOs.CandidateProfile;
+using Hirebase.Application.Events;
 using Hirebase.Application.Interfaces;
 using Hirebase.Domain.Entities.CandidateProfiles;
 using Hirebase.Domain.Enums;
 using Hirebase.Domain.Exceptions;
+using MediatR;
 using System.Text.Json;
 
 
@@ -11,10 +13,15 @@ namespace Hirebase.Application.Services;
 public class CandidateProfileService : ICandidateProfileService
 {
     private readonly ICandidateProfileRepository _repo; 
+    private readonly IMediator _mediator;
 
-    public CandidateProfileService(ICandidateProfileRepository repo)
+    public CandidateProfileService(
+        ICandidateProfileRepository repo,
+        IMediator mediator
+        )
     {
         _repo = repo;
+        _mediator = mediator;
     }
 
     public async Task<CandidateProfileResponseDto> CreateProfile(Guid userId)
@@ -25,6 +32,7 @@ public class CandidateProfileService : ICandidateProfileService
     };
 
     var created = await _repo.CreateProfile(profile);
+    await _mediator.Publish(new CandidateProfileCreatedEvent(created.Id));
 
     return MapToDto(created);
     }
@@ -51,6 +59,7 @@ public class CandidateProfileService : ICandidateProfileService
     profile.UpdatedAt = DateTime.UtcNow;
 
     var updated = await _repo.UpdateProfile(profile, dto.SoftSkills, dto.PreferredRoles);
+    await _mediator.Publish(new CandidateProfileUpdatedEvent(updated.Id));
     return MapToDto(updated);
 }
 

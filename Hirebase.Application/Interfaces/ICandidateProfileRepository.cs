@@ -9,5 +9,9 @@ public interface ICandidateProfileRepository
 
     Task<CandidateProfile?>GetProfileByUserId(Guid userId);
 
+    Task<List<CandidateProfile>>GetAllProfiles();
+
+    Task<CandidateProfile?>GetProfileById(Guid candidateProfileId);
+
 
 }
